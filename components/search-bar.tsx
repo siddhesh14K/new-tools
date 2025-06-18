@@ -1,274 +1,189 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, X } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 
-interface Tool {
-  id: string
-  title: string
-  description: string
-  href: string
-  category: string
-}
-
-const tools: Tool[] = [
+const allTools = [
   {
-    id: "pdf-compressor",
-    title: "PDF Compressor",
-    description: "Reduce PDF file size while maintaining quality",
+    name: "PDF Compressor",
     href: "/pdf-compressor",
     category: "PDF Tools",
+    description: "Compress PDF files up to 90%",
   },
+  { name: "PDF Merger", href: "/pdf-merger", category: "PDF Tools", description: "Combine multiple PDF files" },
+  { name: "PDF Splitter", href: "/pdf-splitter", category: "PDF Tools", description: "Split PDF into pages" },
   {
-    id: "pdf-merger",
-    title: "PDF Merger",
-    description: "Combine multiple PDF files into one document",
-    href: "/pdf-merger",
-    category: "PDF Tools",
-  },
-  {
-    id: "pdf-splitter",
-    title: "PDF Splitter",
-    description: "Extract pages or split PDF into multiple files",
-    href: "/pdf-splitter",
-    category: "PDF Tools",
-  },
-  {
-    id: "image-compressor",
-    title: "Image Compressor",
-    description: "Compress images without losing quality",
+    name: "Image Compressor",
     href: "/image-compressor",
     category: "Image Tools",
+    description: "Compress images without quality loss",
   },
   {
-    id: "image-resizer",
-    title: "Image Resizer",
-    description: "Resize images to specific dimensions",
+    name: "Image Resizer",
     href: "/image-resizer",
     category: "Image Tools",
+    description: "Resize images to any dimension",
   },
   {
-    id: "background-remover",
-    title: "Background Remover",
-    description: "Remove background from images automatically",
+    name: "Background Remover",
     href: "/background-remover",
     category: "Image Tools",
+    description: "Remove image backgrounds with AI",
   },
+  { name: "Word Counter", href: "/word-counter", category: "Text Tools", description: "Count words and characters" },
+  { name: "Case Converter", href: "/case-converter", category: "Text Tools", description: "Convert text case formats" },
+  { name: "Text Formatter", href: "/text-formatter", category: "Text Tools", description: "Format and clean text" },
   {
-    id: "word-counter",
-    title: "Word Counter",
-    description: "Count words, characters, and paragraphs",
-    href: "/word-counter",
-    category: "Text Tools",
-  },
-  {
-    id: "text-formatter",
-    title: "Text Formatter",
-    description: "Format and beautify text content",
-    href: "/text-formatter",
-    category: "Text Tools",
-  },
-  {
-    id: "case-converter",
-    title: "Case Converter",
-    description: "Convert text between different cases",
-    href: "/case-converter",
-    category: "Text Tools",
-  },
-  {
-    id: "json-formatter",
-    title: "JSON Formatter",
-    description: "Format and validate JSON data",
-    href: "/json-formatter",
-    category: "Developer Tools",
-  },
-  {
-    id: "base64-encoder",
-    title: "Base64 Encoder",
-    description: "Encode and decode Base64 strings",
-    href: "/base64-encoder",
-    category: "Developer Tools",
-  },
-  {
-    id: "unit-converter",
-    title: "Unit Converter",
-    description: "Convert between different units of measurement",
-    href: "/unit-converter",
-    category: "Calculators",
-  },
-  {
-    id: "date-calculator",
-    title: "Date Calculator",
-    description: "Calculate differences between dates",
-    href: "/date-calculator",
-    category: "Calculators",
-  },
-  {
-    id: "password-generator",
-    title: "Password Generator",
-    description: "Generate secure random passwords",
-    href: "/password-generator",
-    category: "Security Tools",
-  },
-  {
-    id: "qr-generator",
-    title: "QR Generator",
-    description: "Create custom QR codes for any content",
-    href: "/qr-generator",
-    category: "Developer Tools",
-  },
-  {
-    id: "color-picker",
-    title: "Color Picker",
-    description: "Select and convert between color formats",
-    href: "/color-picker",
-    category: "Design Tools",
-  },
-  {
-    id: "hash-generator",
-    title: "Hash Generator",
-    description: "Generate MD5, SHA-1, SHA-256 hashes",
-    href: "/hash-generator",
-    category: "Security Tools",
-  },
-  {
-    id: "percentage-calculator",
-    title: "Percentage Calculator",
-    description: "Calculate percentages, increases and decreases",
-    href: "/percentage-calculator",
-    category: "Calculators",
-  },
-  {
-    id: "lorem-generator",
-    title: "Lorem Generator",
-    description: "Generate Lorem Ipsum placeholder text",
+    name: "Lorem Generator",
     href: "/lorem-generator",
     category: "Text Tools",
+    description: "Generate Lorem Ipsum text",
   },
   {
-    id: "url-shortener",
-    title: "URL Shortener",
-    description: "Create short links for long URLs",
-    href: "/url-shortener",
-    category: "Web Tools",
+    name: "JSON Formatter",
+    href: "/json-formatter",
+    category: "Developer Tools",
+    description: "Format and validate JSON",
+  },
+  { name: "Base64 Encoder", href: "/base64-encoder", category: "Developer Tools", description: "Encode/decode Base64" },
+  {
+    name: "Hash Generator",
+    href: "/hash-generator",
+    category: "Security Tools",
+    description: "Generate MD5, SHA hashes",
   },
   {
-    id: "meta-tag-generator",
-    title: "Meta Tag Generator",
-    description: "Create meta tags for better SEO",
+    name: "Password Generator",
+    href: "/password-generator",
+    category: "Security Tools",
+    description: "Generate secure passwords",
+  },
+  { name: "QR Generator", href: "/qr-generator", category: "Utility Tools", description: "Create QR codes instantly" },
+  { name: "Color Picker", href: "/color-picker", category: "Design Tools", description: "Pick and convert colors" },
+  { name: "URL Shortener", href: "/url-shortener", category: "Utility Tools", description: "Shorten long URLs" },
+  {
+    name: "Unit Converter",
+    href: "/unit-converter",
+    category: "Calculator Tools",
+    description: "Convert units and measurements",
+  },
+  {
+    name: "Date Calculator",
+    href: "/date-calculator",
+    category: "Calculator Tools",
+    description: "Calculate dates and time",
+  },
+  {
+    name: "Percentage Calculator",
+    href: "/percentage-calculator",
+    category: "Calculator Tools",
+    description: "Calculate percentages",
+  },
+  {
+    name: "Meta Tag Generator",
     href: "/meta-tag-generator",
     category: "SEO Tools",
+    description: "Generate SEO meta tags",
   },
+  { name: "SEO Analyzer", href: "/seo-analyzer", category: "SEO Tools", description: "Analyze website SEO" },
 ]
 
 export function SearchBar() {
   const [query, setQuery] = useState("")
-  const [results, setResults] = useState<Tool[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [filteredTools, setFilteredTools] = useState(allTools)
   const searchRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    if (query.trim() === "") {
+      setFilteredTools(allTools)
+    } else {
+      const filtered = allTools.filter(
+        (tool) =>
+          tool.name.toLowerCase().includes(query.toLowerCase()) ||
+          tool.category.toLowerCase().includes(query.toLowerCase()) ||
+          tool.description.toLowerCase().includes(query.toLowerCase()),
+      )
+      setFilteredTools(filtered)
+    }
+  }, [query])
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  useEffect(() => {
-    if (query.trim() === "") {
-      setResults([])
-      return
-    }
-
-    const filteredResults = tools.filter((tool) => {
-      const searchTerm = query.toLowerCase()
-      return (
-        tool.title.toLowerCase().includes(searchTerm) ||
-        tool.description.toLowerCase().includes(searchTerm) ||
-        tool.category.toLowerCase().includes(searchTerm)
-      )
-    })
-
-    setResults(filteredResults)
-    setIsOpen(true)
-  }, [query])
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && results.length > 0) {
-      router.push(results[0].href)
-      setIsOpen(false)
-      setQuery("")
-    }
-  }
-
-  const clearSearch = () => {
-    setQuery("")
-    setResults([])
+  const handleToolClick = () => {
     setIsOpen(false)
+    setQuery("")
   }
 
   return (
-    <div className="relative w-full" ref={searchRef}>
+    <div ref={searchRef} className="relative w-full max-w-md">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
-          type="search"
-          placeholder="Search for tools... (e.g., PDF compressor, image resizer)"
-          className="pl-10 pr-10 h-12 text-base"
+          type="text"
+          placeholder="Search tools..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => query && setIsOpen(true)}
-          onKeyDown={handleKeyDown}
+          onFocus={() => setIsOpen(true)}
+          className="pl-10 pr-10 h-10"
         />
         {query && (
-          <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3" onClick={clearSearch}>
-            <X className="h-5 w-5" />
-            <span className="sr-only">Clear search</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setQuery("")
+              setIsOpen(false)
+            }}
+            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+          >
+            <X className="h-4 w-4" />
           </Button>
         )}
       </div>
 
-      {isOpen && results.length > 0 && (
-        <div className="absolute z-10 mt-1 w-full bg-background rounded-md shadow-lg border border-border max-h-[60vh] overflow-auto">
-          <ul className="py-2">
-            {results.map((tool) => (
-              <li key={tool.id}>
-                <Link
-                  href={tool.href}
-                  className="flex flex-col px-4 py-3 hover:bg-muted transition-colors"
-                  onClick={() => {
-                    setIsOpen(false)
-                    setQuery("")
-                  }}
-                >
-                  <span className="font-medium">{tool.title}</span>
-                  <span className="text-sm text-muted-foreground">{tool.description}</span>
-                  <span className="text-xs text-muted-foreground mt-1">{tool.category}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {isOpen && query && results.length === 0 && (
-        <div className="absolute z-10 mt-1 w-full bg-background rounded-md shadow-lg border border-border p-4 text-center">
-          <p className="text-muted-foreground">No tools found matching "{query}"</p>
-          <p className="text-sm text-muted-foreground mt-1">Try a different search term</p>
-        </div>
+      {isOpen && (
+        <Card className="absolute top-full left-0 right-0 mt-2 z-50 max-h-96 overflow-y-auto shadow-lg">
+          <CardContent className="p-0">
+            {filteredTools.length > 0 ? (
+              <div className="py-2">
+                {filteredTools.slice(0, 8).map((tool, index) => (
+                  <Link key={tool.href} href={tool.href} onClick={handleToolClick}>
+                    <div className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0">
+                      <div className="font-medium text-sm">{tool.name}</div>
+                      <div className="text-xs text-muted-foreground mt-1">{tool.description}</div>
+                      <div className="text-xs text-primary mt-1">{tool.category}</div>
+                    </div>
+                  </Link>
+                ))}
+                {filteredTools.length > 8 && (
+                  <div className="px-4 py-2 text-xs text-muted-foreground text-center border-t">
+                    +{filteredTools.length - 8} more tools found
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="px-4 py-8 text-center text-muted-foreground">
+                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No tools found for "{query}"</p>
+                <p className="text-xs mt-1">Try searching for PDF, Image, Text, or other keywords</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   )

@@ -58,29 +58,81 @@
   }
 }
 
-/* Custom animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* Performance optimizations */
+img {
+  content-visibility: auto;
+}
+
+/* Mobile-first responsive typography */
+html {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Touch-friendly styles */
+/* Touch-friendly interactions */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
 }
 
-/* Smooth transitions */
+/* Smooth animations with performance optimization */
 * {
   transition: all 0.2s ease-in-out;
+}
+
+/* SEO-friendly content styles */
+.content h1 {
+  @apply text-3xl font-bold mb-6 text-foreground;
+}
+
+.content h2 {
+  @apply text-2xl font-semibold mb-4 mt-8 text-foreground;
+}
+
+.content h3 {
+  @apply text-xl font-medium mb-3 mt-6 text-foreground;
+}
+
+.content p {
+  @apply mb-4 text-muted-foreground leading-relaxed;
+}
+
+.content ul,
+.content ol {
+  @apply mb-4 ml-6 text-muted-foreground;
+}
+
+.content li {
+  @apply mb-2;
+}
+
+/* Core Web Vitals optimizations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* File drop zone styles */
+.dropzone {
+  transition: all 0.2s ease;
+}
+
+.dropzone.active {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.05);
 }
