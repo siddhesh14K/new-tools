@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Scale, ArrowUpDown, Download } from "lucide-react"
-import { CopyButton } from "@/components/copy-button"
+import { Scale, ArrowUpDown } from "lucide-react"
 
 const conversions = {
   weight: {
@@ -88,13 +87,13 @@ export default function UnitConverterPage() {
         converted = celsius + 273.15
       }
 
-      setResult(converted.toFixed(4).replace(/\.?0+$/, ""))
+      setResult(converted.toFixed(2))
     } else {
       // Standard unit conversions
       const fromFactor = categoryData.units[fromUnit as keyof typeof categoryData.units].factor
       const toFactor = categoryData.units[toUnit as keyof typeof categoryData.units].factor
       const converted = (num / fromFactor) * toFactor
-      setResult(converted.toFixed(6).replace(/\.?0+$/, ""))
+      setResult(converted.toFixed(4).replace(/\.?0+$/, ""))
     }
   }
 
@@ -130,36 +129,6 @@ export default function UnitConverterPage() {
   ]
 
   const currentCategory = conversions[category as keyof typeof conversions]
-
-  const downloadResult = () => {
-    if (!inputValue || !result) return
-
-    const categoryData = conversions[category as keyof typeof conversions]
-    const fromUnitName = categoryData.units[fromUnit as keyof typeof categoryData.units].name
-    const toUnitName = categoryData.units[toUnit as keyof typeof categoryData.units].name
-
-    const content = [
-      "UNIT CONVERSION RESULT",
-      "=".repeat(25),
-      "",
-      `Category: ${categoryData.name}`,
-      `From: ${inputValue} ${fromUnitName}`,
-      `To: ${result} ${toUnitName}`,
-      "",
-      `Conversion performed on: ${new Date().toLocaleString()}`,
-      "Powered by FreeTools.online",
-    ].join("\n")
-
-    const blob = new Blob([content], { type: "text/plain" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `unit-conversion-${Date.now()}.txt`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
 
   return (
     <ToolLayout
@@ -251,19 +220,9 @@ export default function UnitConverterPage() {
               <div className="animate-fade-in">
                 <label className="block text-sm font-medium mb-2">Result</label>
                 <div className="bg-muted rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-2xl font-bold text-primary">{result}</div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {currentCategory.units[toUnit as keyof typeof currentCategory.units].name}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <CopyButton text={result} />
-                      <Button onClick={downloadResult} variant="outline" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  <div className="text-2xl font-bold text-primary">{result}</div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {currentCategory.units[toUnit as keyof typeof currentCategory.units].name}
                   </div>
                 </div>
               </div>

@@ -1,19 +1,16 @@
 import type React from "react"
-export const metadata = {
-  title: "URL Shortener - Free Link Shortener Tool | Mobile Tools",
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "URL Shortener - Create Short Links Instantly | Free Online Tools",
   description:
-    "Shorten long URLs instantly with our free URL shortener tool. Create custom short links, track clicks, and manage your URLs easily. No registration required.",
-  keywords: "url shortener, link shortener, short url, custom links, click tracking, free url shortener",
+    "Free online URL shortener tool. Create short, memorable links that redirect to your original URL. No registration required.",
+  keywords: "URL shortener, link shortener, short URL, tiny URL, URL redirect, free URL shortener, custom URL",
   openGraph: {
-    title: "Free URL Shortener Tool - Create Short Links Instantly",
+    title: "URL Shortener - Create Short Links Instantly | Free Online Tools",
     description:
-      "Shorten long URLs and create custom short links with click tracking. Fast, free, and secure URL shortener tool.",
+      "Free online URL shortener tool. Create short, memorable links that redirect to your original URL. No registration required.",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Free URL Shortener Tool - Create Short Links",
-    description: "Shorten URLs instantly with our free tool. Custom links and click tracking included.",
   },
 }
 
@@ -22,5 +19,5 @@ export default function URLShortenerLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return <section>{children}</section>
 }

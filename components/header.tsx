@@ -1,68 +1,93 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
 import { MobileNav } from "@/components/mobile-nav"
 import { SearchBar } from "@/components/search-bar"
+import { Menu, Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
 
-  const navigation = [
-    { name: "PDF Tools", href: "/pdf-tools" },
-    { name: "Image Tools", href: "/image-tools" },
-    { name: "Text Tools", href: "/text-tools" },
-    { name: "Developer Tools", href: "/developer-tools" },
-    { name: "Blog", href: "/blog" },
-  ]
+  useEffect(() => {
+    setMounted(true)
+
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true)
+      } else {
+        setIsScrolled(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">FT</span>
-            </div>
-            <span className="font-bold text-xl">FreeTools</span>
-          </Link>
-        </div>
-
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-6">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {item.name}
+    <header
+      className={`sticky top-0 z-40 w-full transition-all ${
+        isScrolled ? "bg-white/80 dark:bg-gray-950/80 backdrop-blur-md shadow-sm" : "bg-white dark:bg-gray-950"
+      }`}
+    >
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <span className="text-2xl font-bold">Tools</span>
             </Link>
-          ))}
-        </div>
+            <nav className="hidden md:flex items-center space-x-6 ml-10">
+              <Link href="/pdf-tools" className="text-sm font-medium transition-colors hover:text-primary">
+                PDF Tools
+              </Link>
+              <Link href="/image-tools" className="text-sm font-medium transition-colors hover:text-primary">
+                Image Tools
+              </Link>
+              <Link href="/text-tools" className="text-sm font-medium transition-colors hover:text-primary">
+                Text Tools
+              </Link>
+              <Link href="/developer-tools" className="text-sm font-medium transition-colors hover:text-primary">
+                Developer Tools
+              </Link>
+            </nav>
+          </div>
 
-        {/* Search Bar - Hidden on mobile, shown on desktop */}
-        <div className="hidden md:block flex-1 max-w-md mx-4">
-          <SearchBar />
-        </div>
+          <div className="hidden md:flex items-center space-x-4">
+            <SearchBar />
 
-        <div className="flex items-center space-x-2">
-          {/* Mobile menu button */}
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </Button>
+            <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+              {mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </div>
+
+          <div className="flex md:hidden items-center space-x-2">
+            <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+              {mounted && theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+
+            <Button variant="ghost" size="icon" onClick={() => setIsMobileNavOpen(true)}>
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </div>
         </div>
-      </nav>
+      </div>
 
       {/* Mobile Search Bar */}
-      <div className="md:hidden border-t bg-background px-4 py-3">
+      <div className="md:hidden border-t border-gray-200 dark:border-gray-800 py-3 px-4">
         <SearchBar />
       </div>
 
-      {/* Mobile Navigation */}
-      <MobileNav isOpen={mobileMenuOpen} navigation={navigation} />
+      <MobileNav isOpen={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
     </header>
   )
 }
+
+export default Header

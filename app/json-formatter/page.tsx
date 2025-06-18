@@ -24,22 +24,13 @@ export default function JsonFormatterPage() {
     }
 
     try {
-      // Parse and validate JSON
       const parsed = JSON.parse(input)
-
-      // Format with proper indentation
       const formatted = JSON.stringify(parsed, null, 2)
       setOutput(formatted)
       setError("")
       setIsValid(true)
-
-      // Show success message
-      setTimeout(() => {
-        setError("")
-      }, 3000)
     } catch (err) {
-      const error = err as Error
-      setError(`Invalid JSON: ${error.message}`)
+      setError("Invalid JSON format. Please check your input.")
       setOutput("")
       setIsValid(false)
     }
@@ -54,17 +45,13 @@ export default function JsonFormatterPage() {
     }
 
     try {
-      // Parse and validate JSON
       const parsed = JSON.parse(input)
-
-      // Minify by removing all whitespace
       const minified = JSON.stringify(parsed)
       setOutput(minified)
       setError("")
       setIsValid(true)
     } catch (err) {
-      const error = err as Error
-      setError(`Invalid JSON: ${error.message}`)
+      setError("Invalid JSON format. Please check your input.")
       setOutput("")
       setIsValid(false)
     }

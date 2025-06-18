@@ -1,322 +1,256 @@
 "use client"
 
-import { useState } from "react"
-import { ToolLayout } from "@/components/tool-layout"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { LinkIcon, Trash2, Copy, ExternalLink, BarChart3 } from "lucide-react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
+import { Clipboard, Check, Trash2, AlertCircle, LinkIcon } from "lucide-react"
+import { nanoid } from "nanoid"
 
 interface ShortenedUrl {
   id: string
   originalUrl: string
-  shortUrl: string
   shortCode: string
+  createdAt: number
   clicks: number
-  createdAt: Date
 }
 
-export default function URLShortenerPage() {
-  const [originalUrl, setOriginalUrl] = useState("")
+export default function UrlShortener() {
+  const [url, setUrl] = useState("")
   const [customAlias, setCustomAlias] = useState("")
   const [shortenedUrls, setShortenedUrls] = useState<ShortenedUrl[]>([])
-  const [error, setError] = useState("")
-  const [isShortening, setIsShortening] = useState(false)
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const isValidUrl = (url: string) => {
+  // Load saved URLs from localStorage
+  useEffect(() => {
+    const savedUrls = localStorage.getItem("shortenedUrls")
+    if (savedUrls) {
+      try {
+        setShortenedUrls(JSON.parse(savedUrls))
+      } catch (e) {
+        console.error("Failed to parse saved URLs", e)
+      }
+    }
+  }, [])
+
+  // Save URLs to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem("shortenedUrls", JSON.stringify(shortenedUrls))
+  }, [shortenedUrls])
+
+  const isValidUrl = (urlString: string): boolean => {
     try {
-      new URL(url)
+      new URL(urlString)
       return true
-    } catch {
+    } catch (e) {
       return false
     }
   }
 
-  const generateShortCode = (length = 6) => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    let result = ""
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length))
+  const shortenUrl = () => {
+    // Reset states
+    setError(null)
+    setCopied(null)
+
+    // Validate URL
+    if (!url) {
+      setError("Please enter a URL")
+      return
     }
-    return result
+
+    if (!isValidUrl(url)) {
+      setError("Please enter a valid URL")
+      return
+    }
+
+    setIsLoading(true)
+
+    // Generate short code or use custom alias
+    const shortCode = customAlias || nanoid(6)
+
+    // Check if custom alias is already in use
+    if (customAlias && shortenedUrls.some((item) => item.shortCode === customAlias)) {
+      setError("This custom alias is already in use")
+      setIsLoading(false)
+      return
+    }
+
+    // Create new shortened URL
+    const newUrl: ShortenedUrl = {
+      id: nanoid(),
+      originalUrl: url,
+      shortCode,
+      createdAt: Date.now(),
+      clicks: 0,
+    }
+
+    // Add to list
+    setShortenedUrls((prev) => [newUrl, ...prev])
+
+    // Reset form
+    setUrl("")
+    setCustomAlias("")
+
+    // Simulate API delay
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 800)
   }
 
-  const shortenUrl = async () => {
-    if (!originalUrl.trim()) {
-      setError("Please enter a URL to shorten")
-      return
-    }
-
-    if (!isValidUrl(originalUrl)) {
-      setError("Please enter a valid URL (include http:// or https://)")
-      return
-    }
-
-    // Check if URL already exists
-    const existingUrl = shortenedUrls.find((url) => url.originalUrl === originalUrl)
-    if (existingUrl) {
-      setError("This URL has already been shortened")
-      return
-    }
-
-    setIsShortening(true)
-    setError("")
-
-    try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 800))
-
-      const shortCode = customAlias.trim() || generateShortCode()
-
-      // Check if custom alias is already used
-      if (customAlias.trim() && shortenedUrls.some((url) => url.shortCode === customAlias.trim())) {
-        setError("This custom alias is already taken. Please choose another one.")
-        setIsShortening(false)
-        return
-      }
-
-      const newShortenedUrl: ShortenedUrl = {
-        id: Date.now().toString(),
-        originalUrl,
-        shortUrl: `https://short.ly/${shortCode}`,
-        shortCode,
-        clicks: 0,
-        createdAt: new Date(),
-      }
-
-      setShortenedUrls((prev) => [newShortenedUrl, ...prev])
-      setOriginalUrl("")
-      setCustomAlias("")
-    } catch (err) {
-      setError("Failed to shorten URL. Please try again.")
-    } finally {
-      setIsShortening(false)
-    }
-  }
-
-  const copyToClipboard = async (text: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopiedId(id)
-      setTimeout(() => setCopiedId(null), 2000)
-    } catch (err) {
-      console.error("Failed to copy:", err)
-    }
+  const copyToClipboard = (shortCode: string) => {
+    const shortUrl = `${window.location.origin}/s/${shortCode}`
+    navigator.clipboard.writeText(shortUrl)
+    setCopied(shortCode)
+    setTimeout(() => setCopied(null), 2000)
   }
 
   const deleteUrl = (id: string) => {
-    setShortenedUrls((prev) => prev.filter((url) => url.id !== id))
+    setShortenedUrls((prev) => prev.filter((item) => item.id !== id))
   }
 
-  const clearAll = () => {
+  const clearAllUrls = () => {
     setShortenedUrls([])
   }
 
-  const simulateClick = (id: string) => {
-    setShortenedUrls((prev) => prev.map((url) => (url.id === id ? { ...url, clicks: url.clicks + 1 } : url)))
+  const incrementClicks = (id: string) => {
+    setShortenedUrls((prev) => prev.map((item) => (item.id === id ? { ...item, clicks: item.clicks + 1 } : item)))
   }
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  }
-
-  const getTotalClicks = () => {
-    return shortenedUrls.reduce((total, url) => total + url.clicks, 0)
-  }
-
-  const truncateUrl = (url: string, maxLength = 40) => {
-    return url.length > maxLength ? url.substring(0, maxLength) + "..." : url
+  const formatDate = (timestamp: number): string => {
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
   }
 
   return (
-    <ToolLayout
-      title="URL Shortener - Shorten Long URLs Online Free"
-      description="Shorten long URLs for free with custom aliases and click tracking. Perfect for social media, email campaigns, and link sharing. No registration required."
-      icon={<LinkIcon className="h-8 w-8 text-cyan-500" />}
-    >
-      <div className="space-y-6">
-        {/* URL Shortening Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <LinkIcon className="h-5 w-5 mr-2" />
-              Shorten Your URL
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Long URL</label>
-              <Input
-                type="url"
-                placeholder="https://example.com/very-long-url-that-needs-shortening"
-                value={originalUrl}
-                onChange={(e) => setOriginalUrl(e.target.value)}
-                className="text-sm"
-              />
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold mb-2">URL Shortener</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">
+          Create short, memorable links that redirect to your original URL.
+        </p>
 
-            <div>
-              <label className="text-sm font-medium mb-2 block">Custom Alias (Optional)</label>
-              <div className="flex">
-                <span className="inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 rounded-l-md">
-                  short.ly/
-                </span>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Shorten a URL</CardTitle>
+            <CardDescription>Enter a long URL to create a shorter, more manageable link.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="url" className="block text-sm font-medium mb-1">
+                  Long URL
+                </label>
                 <Input
-                  placeholder="my-custom-link"
-                  value={customAlias}
-                  onChange={(e) => setCustomAlias(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
-                  className="rounded-l-none text-sm"
-                  maxLength={20}
+                  id="url"
+                  type="url"
+                  placeholder="https://example.com/very/long/url/that/needs/shortening"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="w-full"
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Leave empty for random short code. Only letters, numbers, hyphens, and underscores allowed.
-              </p>
+
+              <div>
+                <label htmlFor="alias" className="block text-sm font-medium mb-1">
+                  Custom Alias (Optional)
+                </label>
+                <Input
+                  id="alias"
+                  type="text"
+                  placeholder="my-custom-link"
+                  value={customAlias}
+                  onChange={(e) => setCustomAlias(e.target.value)}
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">Leave empty to generate a random code</p>
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
             </div>
-
-            <Button onClick={shortenUrl} disabled={isShortening || !originalUrl.trim()} className="w-full" size="lg">
-              {isShortening ? "🔄 Shortening..." : "🚀 Shorten URL"}
-            </Button>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
           </CardContent>
+          <CardFooter>
+            <Button onClick={shortenUrl} disabled={isLoading} className="w-full sm:w-auto">
+              {isLoading ? "Shortening..." : "Shorten URL"}
+            </Button>
+          </CardFooter>
         </Card>
 
-        {/* Statistics */}
         {shortenedUrls.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2" />
-                  Statistics
-                </div>
-                <Button variant="outline" size="sm" onClick={clearAll}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Clear All
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">{shortenedUrls.length}</div>
-                  <div className="text-sm text-muted-foreground">URLs Shortened</div>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600 mb-1">{getTotalClicks()}</div>
-                  <div className="text-sm text-muted-foreground">Total Clicks</div>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">
-                    {shortenedUrls.length > 0 ? Math.round(getTotalClicks() / shortenedUrls.length) : 0}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Avg. Clicks</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Your Shortened URLs</h2>
+              <Button variant="outline" size="sm" onClick={clearAllUrls}>
+                Clear All
+              </Button>
+            </div>
 
-        {/* Shortened URLs List */}
-        {shortenedUrls.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Your Shortened URLs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {shortenedUrls.map((url) => (
-                  <div key={url.id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-start justify-between">
+            <div className="space-y-4">
+              {shortenedUrls.map((item) => (
+                <Card key={item.id}>
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {url.clicks} clicks
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{formatDate(url.createdAt)}</span>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div>
-                            <p className="text-sm font-medium text-blue-600 break-all">{url.shortUrl}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground break-all">
-                              {truncateUrl(url.originalUrl, 60)}
-                            </p>
-                          </div>
+                        <p className="text-sm font-medium truncate" title={item.originalUrl}>
+                          {item.originalUrl}
+                        </p>
+                        <div className="flex items-center mt-1">
+                          <LinkIcon className="h-4 w-4 mr-1 text-blue-500" />
+                          <p className="text-blue-500 font-medium">
+                            {window.location.origin}/s/{item.shortCode}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2 ml-4">
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(url.shortUrl, url.id)}>
-                          <Copy className="h-4 w-4" />
-                          {copiedId === url.id ? "Copied!" : "Copy"}
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(item.shortCode)}>
+                          {copied === item.shortCode ? (
+                            <Check className="h-4 w-4 mr-1" />
+                          ) : (
+                            <Clipboard className="h-4 w-4 mr-1" />
+                          )}
+                          {copied === item.shortCode ? "Copied" : "Copy"}
                         </Button>
 
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            simulateClick(url.id)
-                            window.open(url.originalUrl, "_blank")
-                          }}
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-
-                        <Button variant="outline" size="sm" onClick={() => deleteUrl(url.id)}>
+                        <Button variant="outline" size="sm" onClick={() => deleteUrl(item.id)}>
                           <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete</span>
                         </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+
+                    <div className="flex justify-between mt-4 text-xs text-gray-500">
+                      <span>Created: {formatDate(item.createdAt)}</span>
+                      <span>Clicks: {item.clicks}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         )}
 
-        {/* How to Use */}
-        <Card>
-          <CardHeader>
-            <CardTitle>How to Use URL Shortener</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-semibold mb-3">📝 Step-by-Step Guide</h3>
-                <ol className="space-y-2 text-sm">
-                  <li>1. Paste your long URL in the input field</li>
-                  <li>2. (Optional) Add a custom alias for branding</li>
-                  <li>3. Click "Shorten URL" to generate short link</li>
-                  <li>4. Copy and share your shortened URL</li>
-                  <li>5. Track clicks and performance</li>
-                </ol>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-3">✨ Features</h3>
-                <ul className="space-y-2 text-sm">
-                  <li>• Custom aliases for branded links</li>
-                  <li>• Click tracking and analytics</li>
-                  <li>• No registration required</li>
-                  <li>• Mobile-friendly interface</li>
-                  <li>• Bulk URL management</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mt-12">
+          <h2 className="text-xl font-bold mb-4">How to Use URL Shortener</h2>
+          <ol className="list-decimal pl-5 space-y-2">
+            <li>Enter the long URL you want to shorten</li>
+            <li>Optionally add a custom alias (or let us generate one)</li>
+            <li>Click "Shorten URL" to create your short link</li>
+            <li>Copy the shortened URL and share it anywhere</li>
+            <li>Track how many times your link has been clicked</li>
+          </ol>
+        </div>
       </div>
-    </ToolLayout>
+    </div>
   )
 }

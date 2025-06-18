@@ -1,213 +1,180 @@
+import type React from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Code, FileText, Hash, Key, Braces, Database } from "lucide-react"
-import { Breadcrumb } from "@/components/breadcrumb"
-import { ToolLayout } from "@/components/tool-layout"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Code, QrCode } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Free Developer Tools Online 2024 - JSON, Base64, Hash Generator | FreeTools.online",
+  title: "Developer Tools - Free Online Web Development Utilities",
   description:
-    "🔧 Best free developer tools online! JSON formatter, Base64 encoder, hash generator, and more. No registration, works on mobile, completely free.",
+    "Free online developer tools including JSON formatter, Base64 encoder/decoder, QR code generator, and more. No registration required.",
   keywords:
-    "free developer tools, JSON formatter online, Base64 encoder, hash generator, developer utilities, coding tools, programming tools",
+    "developer tools, JSON formatter, Base64 encoder, QR code generator, web development tools, free online tools",
 }
 
-const developerTools = [
+interface Tool {
+  id: string
+  title: string
+  description: string
+  icon: React.ReactNode
+  href: string
+  features: string[]
+}
+
+const developerTools: Tool[] = [
   {
-    name: "JSON Formatter",
-    description: "Format, validate, and beautify JSON data instantly",
-    icon: Braces,
+    id: "json-formatter",
+    title: "JSON Formatter",
+    description: "Format and validate JSON data with syntax highlighting",
+    icon: <Code className="h-8 w-8" />,
     href: "/json-formatter",
-    color: "text-cyan-500",
-    bgColor: "bg-cyan-50",
-    features: ["Format JSON", "Validate syntax", "Minify/Beautify", "Error detection"],
-    popular: true,
-    available: true,
+    features: ["Syntax highlighting", "Error detection", "Tree view", "Minify/Beautify", "Copy formatted JSON"],
   },
   {
-    name: "Base64 Encoder",
-    description: "Encode and decode Base64 strings securely",
-    icon: Code,
+    id: "base64-encoder",
+    title: "Base64 Encoder",
+    description: "Encode and decode text and files to/from Base64 format",
+    icon: <Code className="h-8 w-8" />,
     href: "/base64-encoder",
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50",
-    features: ["Encode/Decode", "File support", "URL safe", "Batch processing"],
-    popular: true,
-    available: true,
+    features: [
+      "Text encoding/decoding",
+      "File encoding/decoding",
+      "URL-safe Base64",
+      "Copy results",
+      "Batch processing",
+    ],
   },
   {
-    name: "Hash Generator",
-    description: "Generate MD5, SHA1, SHA256 hashes for text and files",
-    icon: Hash,
-    href: "/hash-generator",
-    color: "text-cyan-700",
-    bgColor: "bg-cyan-50",
-    features: ["Multiple algorithms", "File hashing", "Secure generation", "Compare hashes"],
-    popular: true,
-    available: true,
-  },
-  {
-    name: "URL Encoder",
-    description: "Encode and decode URLs for web development",
-    icon: Key,
-    href: "/url-encoder",
-    color: "text-blue-500",
-    bgColor: "bg-blue-50",
-    features: ["URL encoding", "Component encoding", "Batch processing", "Validation"],
-    popular: false,
-    available: false,
-  },
-  {
-    name: "HTML Validator",
-    description: "Validate HTML markup and find errors",
-    icon: FileText,
-    href: "/html-validator",
-    color: "text-green-500",
-    bgColor: "bg-green-50",
-    features: ["HTML validation", "Error reporting", "Standards check", "Accessibility"],
-    popular: false,
-    available: false,
-  },
-  {
-    name: "SQL Formatter",
-    description: "Format and beautify SQL queries",
-    icon: Database,
-    href: "/sql-formatter",
-    color: "text-purple-500",
-    bgColor: "bg-purple-50",
-    features: ["SQL formatting", "Syntax highlighting", "Query optimization", "Multiple dialects"],
-    popular: false,
-    available: false,
+    id: "qr-generator",
+    title: "QR Code Generator",
+    description: "Create custom QR codes for URLs, text, and contact information",
+    icon: <QrCode className="h-8 w-8" />,
+    href: "/qr-generator",
+    features: ["Custom colors", "Adjustable size", "Error correction", "Logo embedding", "Download as PNG/SVG"],
   },
 ]
 
 export default function DeveloperToolsPage() {
   return (
-    <ToolLayout
-      title="Free Developer Tools Online 2024"
-      description="Essential developer tools for coding, debugging, and web development. JSON formatter, Base64 encoder, hash generator, and more."
-    >
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Developer Tools", href: "/developer-tools" },
-          ]}
-        />
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold mb-4">Developer Tools</h1>
+        <p className="text-xl text-gray-500 dark:text-gray-400 mb-8">
+          Free online utilities to help with web development and programming tasks
+        </p>
 
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">🔧 Free Developer Tools Online 2024</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Essential developer tools for coding, debugging, and web development. Format JSON, encode Base64, generate
-            hashes, and more - all in your browser!
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {developerTools.map((tool, index) => (
-            <Card
-              key={tool.href}
-              className={`h-full transition-all duration-200 relative ${
-                tool.available ? "hover:shadow-lg cursor-pointer" : "opacity-60"
-              }`}
-            >
-              {tool.popular && tool.available && (
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
-                  🔥 POPULAR
-                </div>
-              )}
-              <CardHeader className="pb-4">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className={`bg-background border rounded-lg p-3 ${tool.bgColor}`}>
-                    <tool.icon className={`h-8 w-8 ${tool.color}`} />
+        <div className="grid gap-8">
+          {developerTools.map((tool) => (
+            <Link href={tool.href} key={tool.id} className="block">
+              <Card className="transition-all hover:shadow-md">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-primary/10 rounded-lg">{tool.icon}</div>
+                    <div>
+                      <CardTitle>{tool.title}</CardTitle>
+                      <CardDescription className="mt-1">{tool.description}</CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-xl">
-                      {tool.name}
-                      {!tool.available && (
-                        <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                          Coming Soon
-                        </span>
-                      )}
-                    </CardTitle>
-                  </div>
-                </div>
-                <CardDescription className="text-base leading-relaxed">{tool.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Key Features:</h4>
-                    <ul className="space-y-1">
-                      {tool.features.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground flex items-center">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  {tool.available ? (
-                    <Link href={tool.href}>
-                      <Button className="w-full">Use Tool</Button>
-                    </Link>
-                  ) : (
-                    <Button disabled className="w-full">
-                      Coming Soon
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  <h3 className="font-medium mb-2">Features:</h3>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
+                    {tool.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="w-5 h-5 text-green-500"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Badge variant="outline" className="text-primary">
+                    Try it now
+                  </Badge>
+                </CardFooter>
+              </Card>
+            </Link>
           ))}
         </div>
 
-        {/* SEO Content */}
-        <div className="prose max-w-none">
-          <h2>Essential Developer Tools for Modern Development</h2>
-          <p>
-            Whether you're a frontend developer, backend engineer, or full-stack developer, our tools help you work more
-            efficiently with data formatting, encoding, and validation tasks.
-          </p>
-
-          <h3>🔧 Most Popular Developer Tools</h3>
-          <ul>
-            <li>
-              <strong>JSON Formatter:</strong> Format, validate, and beautify JSON data with syntax highlighting
-            </li>
-            <li>
-              <strong>Base64 Encoder:</strong> Encode and decode Base64 strings for data transmission
-            </li>
-            <li>
-              <strong>Hash Generator:</strong> Generate secure hashes for passwords, files, and data integrity
-            </li>
-          </ul>
-
-          <h3>✨ Perfect for These Use Cases</h3>
-          <ul>
-            <li>
-              <strong>API Development:</strong> Format and validate JSON responses
-            </li>
-            <li>
-              <strong>Data Processing:</strong> Encode/decode data for transmission
-            </li>
-            <li>
-              <strong>Security:</strong> Generate hashes for password verification
-            </li>
-            <li>
-              <strong>Debugging:</strong> Format code and data for easier reading
-            </li>
-            <li>
-              <strong>Web Development:</strong> Validate markup and optimize code
-            </li>
-            <li>
-              <strong>Database Work:</strong> Format SQL queries and validate syntax
-            </li>
-          </ul>
+        <div className="mt-12 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4">Why Use Our Developer Tools?</h2>
+          <div className="grid gap-4">
+            <div className="flex gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5 text-primary mt-1 flex-shrink-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <h3 className="font-medium">100% Free & No Registration</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  All tools are completely free to use with no account required.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5 text-primary mt-1 flex-shrink-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <h3 className="font-medium">Privacy First</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  All processing happens in your browser. Your data never leaves your device.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5 text-primary mt-1 flex-shrink-0"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <h3 className="font-medium">Fast & Reliable</h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  Our tools are optimized for speed and work reliably across all modern browsers.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </ToolLayout>
+    </div>
   )
 }

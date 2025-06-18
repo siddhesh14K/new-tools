@@ -1,233 +1,138 @@
-import { HeroSection } from "@/components/hero-section"
-import { ToolsGrid } from "@/components/tools-grid"
-import { FeaturesSection } from "@/components/features-section"
-import { BlogSection } from "@/components/blog-section"
-import { FAQSection } from "@/components/faq-section"
-import { Breadcrumb } from "@/components/breadcrumb"
-import { TrendingTools } from "@/components/trending-tools"
-import { TestimonialsSection } from "@/components/testimonials-section"
-import { StatsSection } from "@/components/stats-section"
-import { CategorySection } from "@/components/category-section"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { FileText, Calculator, Calendar, Scale, Code, Smartphone, Zap, Shield } from "lucide-react"
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Free Online Tools 2024 - 100+ PDF, Image, Text, Video, SEO Tools",
-  description:
-    "Discover 100+ free online tools for PDF compression, image editing, text conversion, video processing, SEO analysis and more. Fast, secure, mobile-friendly tools.",
-  url: "https://freetools.online",
-  mainEntity: {
-    "@type": "ItemList",
-    name: "Free Online Tools Collection 2024",
-    description: "Comprehensive collection of 100+ free online tools for professionals, students, and developers",
-    numberOfItems: 100,
-    itemListElement: [
-      {
-        "@type": "SoftwareApplication",
-        name: "PDF Compressor Online Free",
-        description: "Compress PDF files online for free without losing quality. Reduce PDF size up to 90%.",
-        url: "https://freetools.online/pdf-compressor",
-        applicationCategory: "Utility",
-        operatingSystem: "Web Browser",
-        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "4.9",
-          reviewCount: "15420",
-        },
-      },
-      {
-        "@type": "SoftwareApplication",
-        name: "Image Compressor Online",
-        description: "Compress images online without losing quality. Support JPG, PNG, WebP formats.",
-        url: "https://freetools.online/image-compressor",
-        applicationCategory: "Utility",
-        operatingSystem: "Web Browser",
-        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "4.8",
-          reviewCount: "12350",
-        },
-      },
-    ],
+const tools = [
+  {
+    name: "JSON Formatter",
+    description: "Format, validate and beautify JSON data instantly",
+    icon: FileText,
+    href: "/json-formatter",
+    color: "text-blue-500",
   },
-  breadcrumb: {
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://freetools.online",
-      },
-    ],
+  {
+    name: "Word Counter",
+    description: "Count words, characters, and analyze text",
+    icon: Calculator,
+    href: "/word-counter",
+    color: "text-green-500",
   },
-}
+  {
+    name: "Date Calculator",
+    description: "Calculate days between dates accurately",
+    icon: Calendar,
+    href: "/date-calculator",
+    color: "text-purple-500",
+  },
+  {
+    name: "Unit Converter",
+    description: "Convert between different units instantly",
+    icon: Scale,
+    href: "/unit-converter",
+    color: "text-orange-500",
+  },
+  {
+    name: "Base64 Encoder",
+    description: "Encode and decode Base64 strings",
+    icon: Code,
+    href: "/base64-encoder",
+    color: "text-red-500",
+  },
+]
 
-export default function HomePage() {
+const features = [
+  {
+    icon: Smartphone,
+    title: "Mobile First",
+    description: "Optimized for one-handed use on all devices",
+  },
+  {
+    icon: Zap,
+    title: "Lightning Fast",
+    description: "Instant results with client-side processing",
+  },
+  {
+    icon: Shield,
+    title: "Privacy Focused",
+    description: "All processing happens locally on your device",
+  },
+]
+
+export default function Home() {
   return (
-    <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <Breadcrumb items={[{ label: "Free Online Tools 2024", href: "/" }]} />
-
-        <HeroSection />
-
-        <StatsSection />
-
-        <TrendingTools />
-
-        <CategorySection />
-
-        <section className="mb-16" id="tools">
-          <h2 className="text-3xl font-bold text-center mb-4">🚀 100+ Free Online Tools 2024</h2>
-          <p className="text-lg text-muted-foreground text-center mb-12 max-w-4xl mx-auto">
-            Access the most comprehensive collection of free online tools for PDF compression, image editing, text
-            conversion, video processing, SEO analysis, and more. All tools work directly in your browser - no
-            downloads, no registration, completely free forever!
-          </p>
-          <ToolsGrid />
-        </section>
-
-        <FeaturesSection />
-
-        <TestimonialsSection />
-
-        <BlogSection />
-
-        <FAQSection />
-
-        {/* SEO Content Section */}
-        <section className="prose max-w-none mt-16">
-          <h2>Why Choose FreeTools.online for Your Daily Tasks?</h2>
-          <p>
-            FreeTools.online is the ultimate destination for free online tools in 2024. Whether you're a student,
-            developer, designer, marketer, or business professional, our comprehensive collection of 100+ tools will
-            help you accomplish any task quickly and efficiently.
-          </p>
-
-          <h3>🎯 Most Popular Free Online Tools</h3>
-          <ul>
-            <li>
-              <strong>PDF Compressor:</strong> Reduce PDF file size by up to 90% without quality loss
-            </li>
-            <li>
-              <strong>Image Compressor:</strong> Optimize images for web and email with smart compression
-            </li>
-            <li>
-              <strong>Word Counter:</strong> Count words, characters, and analyze text in real-time
-            </li>
-            <li>
-              <strong>QR Code Generator:</strong> Create custom QR codes for any purpose
-            </li>
-            <li>
-              <strong>Password Generator:</strong> Generate ultra-secure passwords with custom options
-            </li>
-            <li>
-              <strong>JSON Formatter:</strong> Format, validate, and beautify JSON data instantly
-            </li>
-            <li>
-              <strong>Color Picker:</strong> Pick colors and convert between HEX, RGB, HSL formats
-            </li>
-            <li>
-              <strong>Unit Converter:</strong> Convert between any units of measurement
-            </li>
-          </ul>
-
-          <h3>🔥 Trending Tools Categories</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 not-prose">
-            <div>
-              <h4 className="font-bold text-lg mb-2">📄 PDF Tools</h4>
-              <ul className="text-sm space-y-1">
-                <li>• PDF Compressor - Reduce file size</li>
-                <li>• PDF Merger - Combine multiple PDFs</li>
-                <li>• PDF Splitter - Split PDF pages</li>
-                <li>• PDF to Word - Convert PDF to DOC</li>
-                <li>• PDF Password Remover</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg mb-2">🖼️ Image Tools</h4>
-              <ul className="text-sm space-y-1">
-                <li>• Image Compressor - Optimize images</li>
-                <li>• Image Resizer - Change dimensions</li>
-                <li>• Background Remover - AI-powered</li>
-                <li>• Image Converter - Change formats</li>
-                <li>• Photo Editor - Basic editing</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg mb-2">📝 Text Tools</h4>
-              <ul className="text-sm space-y-1">
-                <li>• Word Counter - Count words & chars</li>
-                <li>• Case Converter - Change text case</li>
-                <li>• Text Formatter - Clean up text</li>
-                <li>• Lorem Ipsum Generator</li>
-                <li>• Duplicate Text Remover</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg mb-2">🔧 Developer Tools</h4>
-              <ul className="text-sm space-y-1">
-                <li>• JSON Formatter - Format & validate</li>
-                <li>• Base64 Encoder - Encode/decode</li>
-                <li>• Hash Generator - MD5, SHA256</li>
-                <li>• URL Encoder - Encode URLs</li>
-                <li>• HTML Encoder - Escape HTML</li>
-              </ul>
-            </div>
-          </div>
-
-          <h3>🚀 Why Our Tools Are Better</h3>
-          <ul>
-            <li>
-              <strong>100% Free Forever:</strong> No hidden costs, no premium plans, no limitations
-            </li>
-            <li>
-              <strong>No Registration Required:</strong> Start using tools immediately
-            </li>
-            <li>
-              <strong>Privacy First:</strong> All processing happens in your browser
-            </li>
-            <li>
-              <strong>Mobile Optimized:</strong> Perfect on phones, tablets, and desktops
-            </li>
-            <li>
-              <strong>Lightning Fast:</strong> Instant results with optimized algorithms
-            </li>
-            <li>
-              <strong>Professional Quality:</strong> Enterprise-grade tools for everyone
-            </li>
-            <li>
-              <strong>Regular Updates:</strong> New tools added every month
-            </li>
-            <li>
-              <strong>24/7 Available:</strong> Access tools anytime, anywhere
-            </li>
-          </ul>
-
-          <h3>💼 Perfect for Professionals</h3>
-          <p>
-            Our tools are trusted by millions of professionals worldwide including students, teachers, developers,
-            designers, marketers, content creators, and business owners. Save time and money with our comprehensive
-            suite of online utilities.
-          </p>
-
-          <h3>🌟 Latest Features in 2024</h3>
-          <ul>
-            <li>AI-powered image background removal</li>
-            <li>Advanced PDF compression algorithms</li>
-            <li>Real-time collaboration features</li>
-            <li>Batch processing for multiple files</li>
-            <li>Cloud storage integration</li>
-            <li>API access for developers</li>
-            <li>Mobile app companion</li>
-            <li>Dark mode support</li>
-          </ul>
-        </section>
+    <div className="container mx-auto px-4 py-6 pb-24 max-w-md">
+      {/* Hero Section */}
+      <div className="text-center mb-8 animate-fade-in">
+        <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          Mobile Tools
+        </h1>
+        <p className="text-muted-foreground text-lg leading-relaxed">
+          Essential utilities designed for your mobile device. Fast, accurate, and easy to use.
+        </p>
       </div>
-    </>
+
+      {/* Features */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        {features.map((feature, index) => (
+          <div key={index} className="text-center animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+            <div className="bg-primary/10 rounded-full p-3 w-12 h-12 mx-auto mb-2 flex items-center justify-center">
+              <feature.icon className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="font-semibold text-sm mb-1">{feature.title}</h3>
+            <p className="text-xs text-muted-foreground">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Tools Grid */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold mb-4">Choose Your Tool</h2>
+        {tools.map((tool, index) => (
+          <Card
+            key={index}
+            className="animate-fade-in hover:shadow-lg transition-all duration-200"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-3">
+                <div className="bg-background border rounded-lg p-2">
+                  <tool.icon className={`h-6 w-6 ${tool.color}`} />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{tool.name}</CardTitle>
+                  <CardDescription className="text-sm">{tool.description}</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <Link href={tool.href}>
+                <Button className="w-full touch-target font-semibold">Open Tool</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* About Section */}
+      <div className="mt-12 text-center">
+        <h2 className="text-xl font-semibold mb-4">Why Mobile Tools?</h2>
+        <div className="bg-muted/50 rounded-lg p-6 text-left space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Mobile Tools is designed specifically for mobile users who need quick, reliable utilities on the go. Each
+            tool is optimized for touch interaction and provides instant results without requiring an internet
+            connection.
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            All processing happens locally on your device, ensuring your data stays private and secure. No registration
+            required, no data collection, just pure functionality when you need it.
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Whether you're a developer, student, or professional, these tools are designed to make your mobile workflow
+            more efficient.
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
