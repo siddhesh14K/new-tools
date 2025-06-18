@@ -221,13 +221,13 @@ export function SearchBar() {
   }
 
   return (
-    <div className="relative w-full max-w-md" ref={searchRef}>
+    <div className="relative w-full" ref={searchRef}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
         <Input
           type="search"
-          placeholder="Search tools..."
-          className="pl-10 pr-10"
+          placeholder="Search for tools... (e.g., PDF compressor, image resizer)"
+          className="pl-10 pr-10 h-12 text-base"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query && setIsOpen(true)}
@@ -235,36 +235,41 @@ export function SearchBar() {
         />
         {query && (
           <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3" onClick={clearSearch}>
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
             <span className="sr-only">Clear search</span>
           </Button>
         )}
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-950 rounded-md shadow-lg border border-gray-200 dark:border-gray-800 max-h-[60vh] overflow-auto">
+        <div className="absolute z-10 mt-1 w-full bg-background rounded-md shadow-lg border border-border max-h-[60vh] overflow-auto">
           <ul className="py-2">
             {results.map((tool) => (
               <li key={tool.id}>
                 <Link
                   href={tool.href}
-                  className="flex flex-col px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-900"
+                  className="flex flex-col px-4 py-3 hover:bg-muted transition-colors"
                   onClick={() => {
                     setIsOpen(false)
                     setQuery("")
                   }}
                 >
                   <span className="font-medium">{tool.title}</span>
-                  <span className="text-sm text-gray-500">{tool.description}</span>
-                  <span className="text-xs text-gray-400 mt-1">{tool.category}</span>
+                  <span className="text-sm text-muted-foreground">{tool.description}</span>
+                  <span className="text-xs text-muted-foreground mt-1">{tool.category}</span>
                 </Link>
               </li>
             ))}
           </ul>
         </div>
       )}
+
+      {isOpen && query && results.length === 0 && (
+        <div className="absolute z-10 mt-1 w-full bg-background rounded-md shadow-lg border border-border p-4 text-center">
+          <p className="text-muted-foreground">No tools found matching "{query}"</p>
+          <p className="text-sm text-muted-foreground mt-1">Try a different search term</p>
+        </div>
+      )}
     </div>
   )
 }
-
-export default SearchBar
