@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import { ToolLayout } from "@/components/tool-layout"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calculator } from "lucide-react"
+import { Calculator, Download } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function WordCounterPage() {
   const [text, setText] = useState("")
@@ -55,6 +56,46 @@ export default function WordCounterPage() {
     { label: "Reading Time", value: `${stats.readingTime} min`, color: "text-indigo-500" },
   ]
 
+  // Add download function
+  const downloadStats = () => {
+    if (!text) return
+
+    const content = [
+      "TEXT ANALYSIS REPORT",
+      "=".repeat(25),
+      "",
+      "STATISTICS:",
+      `• Words: ${stats.words}`,
+      `• Characters: ${stats.characters}`,
+      `• Characters (no spaces): ${stats.charactersNoSpaces}`,
+      `• Sentences: ${stats.sentences}`,
+      `• Paragraphs: ${stats.paragraphs}`,
+      `• Reading Time: ${stats.readingTime} minutes`,
+      "",
+      "ANALYSIS:",
+      `• Average words per sentence: ${stats.sentences > 0 ? Math.round(stats.words / stats.sentences) : 0}`,
+      `• Average characters per word: ${stats.words > 0 ? Math.round(stats.charactersNoSpaces / stats.words) : 0}`,
+      `• Text density: ${stats.characters > 0 ? Math.round((stats.charactersNoSpaces / stats.characters) * 100) : 0}% (excluding spaces)`,
+      "",
+      "ORIGINAL TEXT:",
+      "-".repeat(15),
+      text,
+      "",
+      `Analysis performed on: ${new Date().toLocaleString()}`,
+      "Powered by FreeTools.online",
+    ].join("\n")
+
+    const blob = new Blob([content], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `text-analysis-${Date.now()}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <ToolLayout
       title="Word Counter"
@@ -66,7 +107,16 @@ export default function WordCounterPage() {
         {/* Text Input */}
         <Card>
           <CardContent className="p-4">
-            <label className="block text-sm font-medium mb-2">Enter your text</label>
+            {/* Add download button after the text input */}
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium">Enter your text</label>
+              {text && (
+                <Button onClick={downloadStats} variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Report
+                </Button>
+              )}
+            </div>
             <Textarea
               value={text}
               onChange={(e) => setText(e.target.value)}

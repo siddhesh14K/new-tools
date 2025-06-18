@@ -5,7 +5,7 @@ import { ToolLayout } from "@/components/tool-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar } from "lucide-react"
+import { Calendar, Download } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function DateCalculatorPage() {
@@ -77,6 +77,43 @@ export default function DateCalculatorPage() {
     'Click "Calculate" to see the difference',
     "View results in days, weeks, months, and years",
   ]
+
+  // Add download function
+  const downloadResult = () => {
+    if (!result) return
+
+    const content = [
+      "DATE CALCULATION RESULT",
+      "=".repeat(25),
+      "",
+      `Start Date: ${startDate}`,
+      `End Date: ${endDate}`,
+      "",
+      "TIME DIFFERENCE:",
+      `• Days: ${result.days}`,
+      `• Weeks: ${result.weeks}`,
+      `• Months: ${result.months}`,
+      `• Years: ${result.years}`,
+      "",
+      "DETAILED BREAKDOWN:",
+      `• Total hours: ${result.totalHours.toLocaleString()}`,
+      `• Total minutes: ${result.totalMinutes.toLocaleString()}`,
+      `• Weeks + remaining days: ${result.weeks} weeks, ${result.days % 7} days`,
+      "",
+      `Calculation performed on: ${new Date().toLocaleString()}`,
+      "Powered by FreeTools.online",
+    ].join("\n")
+
+    const blob = new Blob([content], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `date-calculation-${Date.now()}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <ToolLayout
@@ -180,7 +217,13 @@ export default function DateCalculatorPage() {
             {/* Additional Details */}
             <Card>
               <CardContent className="p-4">
-                <h4 className="font-semibold mb-2">Detailed Breakdown</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">Detailed Breakdown</h4>
+                  <Button onClick={downloadResult} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
                 <div className="space-y-1 text-sm text-muted-foreground">
                   <p>• Total hours: {result.totalHours.toLocaleString()}</p>
                   <p>• Total minutes: {result.totalMinutes.toLocaleString()}</p>
