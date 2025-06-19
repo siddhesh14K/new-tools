@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next"
+import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,20 +6,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/api/",
-          "/admin/",
-          "/_next/",
-          "/*.json$",
-          "/*.xml$",
-        ]
+        disallow: ["/api/", "/admin/", "/_next/"],
       },
       {
         userAgent: "Googlebot",
-        allow: ["/*.json$", "/*.xml$"],
-      }
+        allow: ["/"],
+      },
     ],
     sitemap: "https://freetools.site/sitemap.xml",
     host: "https://freetools.site",
-  }
+  };
 }
