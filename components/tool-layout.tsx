@@ -1,50 +1,66 @@
 "use client"
 
+import React from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Breadcrumb } from "@/components/breadcrumb"
-import type { ReactNode } from "react"
+import { EnhancedBreadcrumb } from "./enhanced-breadcrumb"
+import { HowToSchema } from "./how-to-schema"
+import { FAQ } from "./faq"
+import { Analytics } from "./analytics"
+import type { Metadata } from "next"
 
 interface ToolLayoutProps {
   title: string
   description: string
-  icon: ReactNode
-  children: ReactNode
+  icon: React.ReactNode
+  children: React.ReactNode
   keywords?: string
+  toolCategory: string
+  howToSteps: Array<{ name: string; text: string; image?: string }>
+  faqs: Array<{ question: string; answer: string }>
+  breadcrumbs: Array<{ label: string; path: string }>
+  lastUpdated: string
+  estimatedTime?: string
 }
 
-export function ToolLayout({ title, description, icon, children, keywords }: ToolLayoutProps) {
-  const breadcrumbItems = [
-    { label: "Home", href: "/" },
-    { label: title, href: "#" },
-  ]
-
-  const toolJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: title,
-    description: description,
-    url: typeof window !== "undefined" ? window.location.href : "",
-    applicationCategory: "Utility",
-    operatingSystem: "Web Browser",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
-    author: {
-      "@type": "Organization",
-      name: "FreeTools.online",
-    },
-  }
-
+export function ToolLayout({
+  title,
+  description,
+  icon,
+  children,
+  keywords,
+  toolCategory,
+  howToSteps,
+  faqs,
+  breadcrumbs,
+  lastUpdated,
+  estimatedTime,
+}: ToolLayoutProps) {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(toolJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: title,
+            applicationCategory: "WebApplication",
+            operatingSystem: "Any",
+            dateModified: lastUpdated,
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+          }),
+        }}
+      />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Breadcrumb items={breadcrumbItems} />
+        <EnhancedBreadcrumb items={breadcrumbs} />
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -62,11 +78,28 @@ export function ToolLayout({ title, description, icon, children, keywords }: Too
             {icon}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">{description}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            {description}
+          </p>
+          <div className="text-sm text-muted-foreground mt-2">
+            Last Updated: {lastUpdated}
+          </div>
         </header>
 
         {/* Tool Content */}
         <div className="mb-12">{children}</div>
+
+        <FAQ category={toolCategory} questions={faqs} />
+
+        <HowToSchema
+          name={title}
+          description={description}
+          steps={howToSteps}
+          totalTime={estimatedTime}
+          toolCategory={toolCategory}
+        />
+
+        <Analytics />
       </div>
     </>
   )
