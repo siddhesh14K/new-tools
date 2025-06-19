@@ -106,7 +106,7 @@ export default function DeveloperToolsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {developerTools.map((tool, index) => (
+          {developerTools.map((tool) => (
             <Card
               key={tool.href}
               className={`h-full transition-all duration-200 relative ${
@@ -141,12 +141,13 @@ export default function DeveloperToolsPage() {
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm">Key Features:</h4>
                     <ul className="space-y-1">
-                      {tool.features.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground flex items-center">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
-                          {feature}
-                        </li>
-                      ))}
+                      {Array.isArray(tool.features) &&
+                        tool.features.map((feature, idx) => (
+                          <li key={idx} className="text-sm text-muted-foreground flex items-center">
+                            <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
+                            {feature}
+                          </li>
+                        ))}
                     </ul>
                   </div>
                   {tool.available ? (
@@ -164,7 +165,6 @@ export default function DeveloperToolsPage() {
           ))}
         </div>
 
-        {/* SEO Content */}
         <div className="prose max-w-none">
           <h2>Essential Developer Tools for Modern Development</h2>
           <p>
