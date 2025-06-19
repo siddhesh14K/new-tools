@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Code, FileText, Hash, Key, Braces, Database } from "lucide-react";
-import { Breadcrumb } from "@/components/breadcrumb";
-import { ToolLayout } from "@/components/tool-layout";
+import type { Metadata } from "next"
+import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Code, FileText, Hash, Key, Braces, Database } from "lucide-react"
+import { Breadcrumb } from "@/components/breadcrumb"
+import { ToolLayout } from "@/components/tool-layout"
 
 export const metadata: Metadata = {
   title: "Free Developer Tools Online 2024 - JSON, Base64, Hash Generator | FreeTools.online",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "🔧 Best free developer tools online! JSON formatter, Base64 encoder, hash generator, and more. No registration, works on mobile, completely free.",
   keywords:
     "free developer tools, JSON formatter online, Base64 encoder, hash generator, developer utilities, coding tools, programming tools",
-};
+}
 
 const developerTools = [
   {
@@ -55,6 +55,8 @@ const developerTools = [
     href: "/url-encoder",
     color: "text-blue-500",
     bgColor: "bg-blue-50",
+    // No features included (simulate missing data)
+    popular: false,
     available: false,
   },
   {
@@ -64,6 +66,8 @@ const developerTools = [
     href: "/html-validator",
     color: "text-green-500",
     bgColor: "bg-green-50",
+    // No features
+    popular: false,
     available: false,
   },
   {
@@ -73,9 +77,11 @@ const developerTools = [
     href: "/sql-formatter",
     color: "text-purple-500",
     bgColor: "bg-purple-50",
+    // No features
+    popular: false,
     available: false,
   },
-];
+]
 
 export default function DeveloperToolsPage() {
   return (
@@ -161,5 +167,5 @@ export default function DeveloperToolsPage() {
         </div>
       </div>
     </ToolLayout>
-  );
+  )
 }
