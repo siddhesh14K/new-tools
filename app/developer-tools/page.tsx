@@ -55,7 +55,7 @@ const developerTools = [
     href: "/url-encoder",
     color: "text-blue-500",
     bgColor: "bg-blue-50",
-    // No features included (simulate missing data)
+    features: ["URL encoding", "Component encoding", "Batch processing", "Validation"],
     popular: false,
     available: false,
   },
@@ -66,7 +66,7 @@ const developerTools = [
     href: "/html-validator",
     color: "text-green-500",
     bgColor: "bg-green-50",
-    // No features
+    features: ["HTML validation", "Error reporting", "Standards check", "Accessibility"],
     popular: false,
     available: false,
   },
@@ -77,7 +77,7 @@ const developerTools = [
     href: "/sql-formatter",
     color: "text-purple-500",
     bgColor: "bg-purple-50",
-    // No features
+    features: ["SQL formatting", "Syntax highlighting", "Query optimization", "Multiple dialects"],
     popular: false,
     available: false,
   },
@@ -106,7 +106,7 @@ export default function DeveloperToolsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {developerTools.map((tool) => (
+          {developerTools.map((tool, index) => (
             <Card
               key={tool.href}
               className={`h-full transition-all duration-200 relative ${
@@ -138,19 +138,17 @@ export default function DeveloperToolsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {Array.isArray(tool.features) && (
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-sm">Key Features:</h4>
-                      <ul className="space-y-1">
-                        {tool.features.map((feature, idx) => (
-                          <li key={idx} className="text-sm text-muted-foreground flex items-center">
-                            <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm">Key Features:</h4>
+                    <ul className="space-y-1">
+                      {tool.features.map((feature, idx) => (
+                        <li key={idx} className="text-sm text-muted-foreground flex items-center">
+                          <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                   {tool.available ? (
                     <Link href={tool.href}>
                       <Button className="w-full">Use Tool</Button>
@@ -164,6 +162,50 @@ export default function DeveloperToolsPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* SEO Content */}
+        <div className="prose max-w-none">
+          <h2>Essential Developer Tools for Modern Development</h2>
+          <p>
+            Whether you're a frontend developer, backend engineer, or full-stack developer, our tools help you work more
+            efficiently with data formatting, encoding, and validation tasks.
+          </p>
+
+          <h3>🔧 Most Popular Developer Tools</h3>
+          <ul>
+            <li>
+              <strong>JSON Formatter:</strong> Format, validate, and beautify JSON data with syntax highlighting
+            </li>
+            <li>
+              <strong>Base64 Encoder:</strong> Encode and decode Base64 strings for data transmission
+            </li>
+            <li>
+              <strong>Hash Generator:</strong> Generate secure hashes for passwords, files, and data integrity
+            </li>
+          </ul>
+
+          <h3>✨ Perfect for These Use Cases</h3>
+          <ul>
+            <li>
+              <strong>API Development:</strong> Format and validate JSON responses
+            </li>
+            <li>
+              <strong>Data Processing:</strong> Encode/decode data for transmission
+            </li>
+            <li>
+              <strong>Security:</strong> Generate hashes for password verification
+            </li>
+            <li>
+              <strong>Debugging:</strong> Format code and data for easier reading
+            </li>
+            <li>
+              <strong>Web Development:</strong> Validate markup and optimize code
+            </li>
+            <li>
+              <strong>Database Work:</strong> Format SQL queries and validate syntax
+            </li>
+          </ul>
         </div>
       </div>
     </ToolLayout>
