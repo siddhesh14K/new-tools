@@ -1,50 +1,55 @@
+"use client";
+
+import JsonLdSchema from "./json-ld-schema";
+import { memo } from "react";
+
 interface HowToStep {
-  name: string
-  text: string
-  image?: string
+  name: string;
+  text: string;
+  url?: string;
+  image?: string;
 }
 
 interface HowToSchemaProps {
-  name: string
-  description: string
-  steps: HowToStep[]
-  totalTime?: string
-  toolCategory: string
+  name: string;
+  description: string;
+  totalTime: string;
+  estimatedCost?: {
+    currency: string;
+    value: string;
+  };
+  supply?: { name: string }[];
+  tool?: { name: string }[];
+  step: HowToStep[];
 }
 
-export function HowToSchema({ name, description, steps, totalTime, toolCategory }: HowToSchemaProps) {
-  const structuredData = {
+function HowToSchemaComponent({
+  name,
+  description,
+  totalTime,
+  estimatedCost,
+  supply,
+  tool,
+  step,
+}: HowToSchemaProps) {
+  const schema = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": name,
-    "description": description,
-    "totalTime": totalTime || "PT5M",
-    "supply": [{
-      "@type": "HowToSupply",
-      "name": `File to ${toolCategory.toLowerCase()}`
-    }],
-    "tool": [{
-      "@type": "HowToTool",
-      "name": "Web Browser"
-    }],
-    "step": steps.map((step, index) => ({
+    name,
+    description,
+    totalTime,
+    estimatedCost,
+    supply,
+    tool,
+    step: step.map((s, index) => ({
       "@type": "HowToStep",
-      "position": index + 1,
-      "name": step.name,
-      "text": step.text,
-      ...(step.image && {
-        "image": {
-          "@type": "ImageObject",
-          "url": `https://freetools.site${step.image}`
-        }
-      })
-    }))
-  }
+      ...s,
+      url: s.url || undefined,
+      image: s.image || undefined,
+    })),
+  };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-    />
-  )
+  return <JsonLdSchema schema={schema} />;
 }
+
+export const HowToSchema = memo(HowToSchemaComponent);

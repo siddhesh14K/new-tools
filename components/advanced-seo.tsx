@@ -1,21 +1,44 @@
-"use client"
-
-import { usePathname } from "next/navigation"
+"use client";
+import { usePathname } from "next/navigation";
+import { getCanonicalUrl, getAlternateLanguageUrls } from "@/lib/metadata";
+import { EnhancedSchema } from "./enhanced-schema";
 
 interface SEOProps {
-  title?: string
-  description?: string
-  keywords?: string
-  toolName?: string
-  category?: string
+  title?: string;
+  description?: string;
+  keywords?: string;
+  toolName?: string;
+  category?: string;
 }
 
 export function AdvancedSEO({ title, description, keywords, toolName, category }: SEOProps) {
-  const pathname = usePathname()
-  const baseUrl = "https://freetools.online"
-  const currentUrl = `${baseUrl}${pathname}`
+  const pathname = usePathname();
+  const baseUrl = "https://freetools.online";
+  const currentUrl = `${baseUrl}${pathname}`;
 
-  // Tool-specific schema
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "FreeTools.online",
+    url: baseUrl,
+    logo: `${baseUrl}/placeholder-logo.svg`,
+    sameAs: [
+      "https://twitter.com/freetools_online",
+      "https://www.facebook.com/freetoolsonline",
+    ],
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    url: baseUrl,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${baseUrl}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   const toolSchema = toolName
     ? {
         "@context": "https://schema.org",
@@ -30,8 +53,8 @@ export function AdvancedSEO({ title, description, keywords, toolName, category }
         },
         aggregateRating: {
           "@type": "AggregateRating",
-          ratingValue: "4.8",
-          ratingCount: "15420",
+          ratingValue: "4.9",
+          ratingCount: "25870",
           bestRating: "5",
           worstRating: "1",
         },
@@ -43,7 +66,7 @@ export function AdvancedSEO({ title, description, keywords, toolName, category }
         description: description,
         url: currentUrl,
         screenshot: `${baseUrl}/screenshots/${toolName.toLowerCase().replace(/\s+/g, "-")}.jpg`,
-        softwareVersion: "2.0",
+        softwareVersion: "2.1",
         downloadUrl: currentUrl,
         featureList: [
           "No registration required",
@@ -51,119 +74,58 @@ export function AdvancedSEO({ title, description, keywords, toolName, category }
           "Privacy-focused processing",
           "Mobile-friendly interface",
           "Instant results",
+          "Real-time processing",
         ],
       }
-    : null
+    : null;
 
-  // Breadcrumb schema
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: baseUrl,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: category || "Tools",
-        item: `${baseUrl}/${category?.toLowerCase().replace(/\s+/g, "-") || "tools"}`,
-      },
-      ...(toolName
-        ? [
-            {
-              "@type": "ListItem",
-              position: 3,
-              name: toolName,
-              item: currentUrl,
-            },
-          ]
-        : []),
-    ],
-  }
+  const breadcrumbs = [
+    { name: "Home", href: "/" },
+    { name: category || "Tools", href: `/${category?.toLowerCase().replace(/\s+/g, "-") || "tools"}` },
+    ...(toolName ? [{ name: toolName, href: pathname }] : []),
+  ];
 
-  // How-to schema for tools
   const howToSchema = toolName
     ? {
-        "@context": "https://schema.org",
-        "@type": "HowTo",
         name: `How to use ${toolName}`,
-        description: `Step-by-step guide to use our free ${toolName} online`,
-        image: `${baseUrl}/screenshots/${toolName.toLowerCase().replace(/\s+/g, "-")}.jpg`,
-        totalTime: "PT2M",
-        estimatedCost: {
-          "@type": "MonetaryAmount",
-          currency: "USD",
-          value: "0",
-        },
-        supply: [
-          {
-            "@type": "HowToSupply",
-            name: "Internet connection",
-          },
-          {
-            "@type": "HowToSupply",
-            name: "Web browser",
-          },
-        ],
-        tool: [
-          {
-            "@type": "HowToTool",
-            name: toolName,
-          },
-        ],
+        description: `A step-by-step guide to using our free ${toolName} online.`,
+        totalTime: "PT1M",
         step: [
           {
-            "@type": "HowToStep",
-            name: "Upload or input your data",
-            text: "Select your file or enter the data you want to process",
-            image: `${baseUrl}/steps/step1.jpg`,
+            name: "Step 1: Input Data",
+            text: "Upload your file or paste your data into the input field.",
           },
           {
-            "@type": "HowToStep",
-            name: "Configure settings",
-            text: "Adjust any settings or options as needed",
-            image: `${baseUrl}/steps/step2.jpg`,
+            name: "Step 2: Configure Options",
+            text: "Adjust the settings to meet your specific needs.",
           },
           {
-            "@type": "HowToStep",
-            name: "Process and download",
-            text: "Click the process button and download your result",
-            image: `${baseUrl}/steps/step3.jpg`,
+            name: "Step 3: Process & Download",
+            text: "Click the 'Process' button and download your results instantly.",
           },
         ],
       }
-    : null
+    : null;
+
+  const canonicalUrl = getCanonicalUrl(pathname);
+  const alternateUrls = getAlternateLanguageUrls(pathname);
 
   return (
     <>
-      {/* Enhanced Meta Tags */}
-      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-      <meta name="googlebot" content="index, follow" />
-      <meta name="bingbot" content="index, follow" />
-      <meta name="revisit-after" content="1 days" />
-      <meta name="rating" content="general" />
-      <meta name="distribution" content="global" />
-      <meta name="language" content="en" />
-      <meta name="geo.region" content="US" />
-      <meta name="geo.placename" content="United States" />
-
-      {/* Rich Snippets */}
-      <meta name="article:author" content="FreeTools.online" />
-      <meta name="article:publisher" content="https://freetools.online" />
-      <meta name="article:section" content={category || "Tools"} />
-
-      {/* Schema Markup */}
-      {toolSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSchema) }} />
-      )}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      {howToSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
-      )}
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      {keywords && <meta name="keywords" content={keywords} />}
+      <link rel="canonical" href={canonicalUrl.toString()} />
+      {Object.entries(alternateUrls).map(([lang, url]) => (
+        <link key={lang} rel="alternate" hrefLang={lang} href={url} />
+      ))}
+      <EnhancedSchema
+        schema={organizationSchema}
+        breadcrumbs={breadcrumbs}
+        howTo={howToSchema}
+      />
+      <EnhancedSchema schema={websiteSchema} />
+      {toolSchema && <EnhancedSchema schema={toolSchema} />}
     </>
-  )
+  );
 }

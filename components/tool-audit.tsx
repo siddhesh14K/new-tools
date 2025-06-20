@@ -1,238 +1,101 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { CheckCircle, XCircle, AlertCircle, ExternalLink } from "lucide-react"
+import { useState, useEffect } from "react";
 
-interface ToolStatus {
-  name: string
-  url: string
-  status: "working" | "broken" | "slow" | "testing"
-  lastChecked: Date
-  responseTime: number
-  features: string[]
-  issues: string[]
-  seoScore: number
+interface ToolAuditProps {
+  toolName: string;
+  description: string;
+  keywords: string[];
 }
 
-export function ToolAudit() {
-  const [tools, setTools] = useState<ToolStatus[]>([])
-  const [isAuditing, setIsAuditing] = useState(false)
+interface AuditResult {
+  issue: string;
+  recommendation: string;
+  priority: "High" | "Medium" | "Low";
+}
 
-  const toolsToAudit = [
-    { name: "PDF Compressor", url: "/pdf-compressor" },
-    { name: "PDF Merger", url: "/pdf-merger" },
-    { name: "PDF Splitter", url: "/pdf-splitter" },
-    { name: "Image Compressor", url: "/image-compressor" },
-    { name: "Image Resizer", url: "/image-resizer" },
-    { name: "Background Remover", url: "/background-remover" },
-    { name: "Word Counter", url: "/word-counter" },
-    { name: "Text Formatter", url: "/text-formatter" },
-    { name: "Case Converter", url: "/case-converter" },
-    { name: "JSON Formatter", url: "/json-formatter" },
-    { name: "Base64 Encoder", url: "/base64-encoder" },
-    { name: "Hash Generator", url: "/hash-generator" },
-    { name: "Password Generator", url: "/password-generator" },
-    { name: "QR Generator", url: "/qr-generator" },
-    { name: "Color Picker", url: "/color-picker" },
-    { name: "URL Shortener", url: "/url-shortener" },
-    { name: "Unit Converter", url: "/unit-converter" },
-    { name: "Date Calculator", url: "/date-calculator" },
-    { name: "Percentage Calculator", url: "/percentage-calculator" },
-    { name: "Lorem Generator", url: "/lorem-generator" },
-    { name: "Meta Tag Generator", url: "/meta-tag-generator" },
-    { name: "SEO Analyzer", url: "/seo-analyzer" },
-  ]
+const priorityConfig = {
+  High: {
+    className: "border-red-500 bg-red-50",
+    label: "High Priority",
+  },
+  Medium: {
+    className: "border-yellow-500 bg-yellow-50",
+    label: "Medium Priority",
+  },
+  Low: {
+    className: "border-blue-500 bg-blue-50",
+    label: "Low Priority",
+  },
+};
 
-  const auditTool = async (tool: { name: string; url: string }): Promise<ToolStatus> => {
-    const startTime = Date.now()
+export function ToolAudit({ toolName, description, keywords }: ToolAuditProps) {
+  const [auditResults, setAuditResults] = useState<AuditResult[]>([]);
 
-    try {
-      // Simulate tool testing
-      await new Promise((resolve) => setTimeout(resolve, Math.random() * 1000 + 500))
+  useEffect(() => {
+    const results: AuditResult[] = [];
 
-      const responseTime = Date.now() - startTime
-      const isWorking = Math.random() > 0.1 // 90% success rate
-      const isSlow = responseTime > 2000
-
-      return {
-        name: tool.name,
-        url: tool.url,
-        status: !isWorking ? "broken" : isSlow ? "slow" : "working",
-        lastChecked: new Date(),
-        responseTime,
-        features: [
-          "File processing",
-          "Download functionality",
-          "Mobile responsive",
-          "Error handling",
-          "Progress indicators",
-        ],
-        issues: !isWorking ? ["Tool not responding", "Processing failed"] : isSlow ? ["Slow response time"] : [],
-        seoScore: Math.floor(Math.random() * 20) + 80, // 80-100 score
-      }
-    } catch (error) {
-      return {
-        name: tool.name,
-        url: tool.url,
-        status: "broken",
-        lastChecked: new Date(),
-        responseTime: 0,
-        features: [],
-        issues: ["Failed to load", "Network error"],
-        seoScore: 0,
-      }
-    }
-  }
-
-  const runAudit = async () => {
-    setIsAuditing(true)
-    const results: ToolStatus[] = []
-
-    for (const tool of toolsToAudit) {
-      const result = await auditTool(tool)
-      results.push(result)
-      setTools([...results]) // Update UI progressively
+    // Check 1: Description Length
+    if (description.length < 70) {
+      results.push({
+        issue: "Description Too Short",
+        recommendation: `The description is ${description.length} characters. It should be at least 70 characters to be effective for SEO.`,
+        priority: "Medium",
+      });
+    } else if (description.length > 160) {
+      results.push({
+        issue: "Description Too Long",
+        recommendation: `The description is ${description.length} characters. It should be under 160 characters to avoid being truncated in search results.`,
+        priority: "Medium",
+      });
     }
 
-    setIsAuditing(false)
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "working":
-        return <CheckCircle className="h-5 w-5 text-green-500" />
-      case "broken":
-        return <XCircle className="h-5 w-5 text-red-500" />
-      case "slow":
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />
-      default:
-        return <AlertCircle className="h-5 w-5 text-gray-500" />
+    // Check 2: Keyword Count
+    if (keywords.length < 5) {
+      results.push({
+        issue: "Insufficient Keywords",
+        recommendation: `Only ${keywords.length} keywords found. Add at least 5 relevant keywords to improve search visibility.`,
+        priority: "Medium",
+      });
     }
-  }
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      working: "default",
-      broken: "destructive",
-      slow: "secondary",
-      testing: "outline",
-    } as const
+    // Check 3: Tool Name in Keywords
+    if (!keywords.map(k => k.toLowerCase()).includes(toolName.toLowerCase())) {
+      results.push({
+        issue: "Tool Name Missing from Keywords",
+        recommendation: "Include the tool's name in the keywords to improve its relevance for direct searches.",
+        priority: "High",
+      });
+    }
 
-    return <Badge variant={variants[status as keyof typeof variants]}>{status.toUpperCase()}</Badge>
-  }
-
-  const workingTools = tools.filter((t) => t.status === "working").length
-  const brokenTools = tools.filter((t) => t.status === "broken").length
-  const slowTools = tools.filter((t) => t.status === "slow").length
-  const avgResponseTime =
-    tools.length > 0 ? Math.round(tools.reduce((sum, t) => sum + t.responseTime, 0) / tools.length) : 0
-  const avgSeoScore = tools.length > 0 ? Math.round(tools.reduce((sum, t) => sum + t.seoScore, 0) / tools.length) : 0
+    setAuditResults(results);
+  }, [toolName, description, keywords]);
 
   return (
-    <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">{workingTools}</div>
-            <div className="text-sm text-muted-foreground">Working Tools</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">{brokenTools}</div>
-            <div className="text-sm text-muted-foreground">Broken Tools</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{avgResponseTime}ms</div>
-            <div className="text-sm text-muted-foreground">Avg Response</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{avgSeoScore}/100</div>
-            <div className="text-sm text-muted-foreground">SEO Score</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Audit Controls */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            🔍 Tool Audit System
-            <Button onClick={runAudit} disabled={isAuditing}>
-              {isAuditing ? "Auditing..." : "Run Full Audit"}
-            </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Comprehensive testing of all tools including functionality, performance, and SEO optimization.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Tool Results */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tools.map((tool, index) => (
-          <Card key={index} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{tool.name}</CardTitle>
-                {getStatusIcon(tool.status)}
-              </div>
-              <div className="flex items-center gap-2">
-                {getStatusBadge(tool.status)}
-                <Badge variant="outline">{tool.responseTime}ms</Badge>
-                <Badge variant="outline">SEO: {tool.seoScore}/100</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <h4 className="font-medium text-sm mb-1">Features</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {tool.features.slice(0, 3).map((feature, i) => (
-                      <Badge key={i} variant="secondary" className="text-xs">
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
+    <div className="p-6 border rounded-xl shadow-sm bg-white">
+      <h3 className="text-xl font-bold text-gray-800">Tool Health & SEO Audit</h3>
+      <p className="text-sm text-gray-500 mb-4">Automated checks for performance, SEO, and best practices.</p>
+      {auditResults.length > 0 ? (
+        <ul className="space-y-3">
+          {auditResults.map((result, index) => {
+            const config = priorityConfig[result.priority];
+            return (
+              <li key={index} className={`p-4 border-l-4 rounded-r-lg ${config.className}`}>
+                <div className="flex justify-between items-center">
+                  <p className="font-semibold text-gray-900">{result.issue}</p>
+                  <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-200 text-gray-700">{config.label}</span>
                 </div>
-
-                {tool.issues.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-sm mb-1 text-red-600">Issues</h4>
-                    <ul className="text-xs text-red-600 space-y-1">
-                      {tool.issues.map((issue, i) => (
-                        <li key={i}>• {issue}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Last checked: {tool.lastChecked.toLocaleTimeString()}</span>
-                  <a
-                    href={tool.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 hover:text-primary"
-                  >
-                    Test <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <p className="text-sm text-gray-600 mt-1">{result.recommendation}</p>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div className="text-center p-6 rounded-lg bg-green-50 border border-green-200">
+          <p className="font-semibold text-green-800">🎉 All checks passed!</p>
+          <p className="text-sm text-green-700">No major SEO or health issues found. Great job!</p>
+        </div>
+      )}
     </div>
-  )
+  );
 }

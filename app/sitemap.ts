@@ -1,199 +1,74 @@
-import type { MetadataRoute } from "next"
-
-
-
-const tools = [
-
-// PDF Tools
-
-{ slug: "pdf-compressor", priority: 0.9, changeFreq: "weekly" as const },
-
-{ slug: "pdf-merger", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "pdf-splitter", priority: 0.8, changeFreq: "weekly" as const },
-
-
-
-// Image Tools
-
-{ slug: "image-compressor", priority: 0.9, changeFreq: "weekly" as const },
-
-{ slug: "image-resizer", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "background-remover", priority: 0.9, changeFreq: "weekly" as const },
-
-
-
-// Text Tools
-
-{ slug: "word-counter", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "case-converter", priority: 0.7, changeFreq: "weekly" as const },
-
-{ slug: "text-formatter", priority: 0.7, changeFreq: "weekly" as const },
-
-{ slug: "lorem-generator", priority: 0.6, changeFreq: "weekly" as const },
-
-
-
-// Developer Tools
-
-{ slug: "base64-encoder", priority: 0.7, changeFreq: "weekly" as const },
-
-{ slug: "json-formatter", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "hash-generator", priority: 0.7, changeFreq: "weekly" as const },
-
-
-
-// Utility Tools
-
-{ slug: "password-generator", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "qr-generator", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "color-picker", priority: 0.7, changeFreq: "weekly" as const },
-
-{ slug: "url-shortener", priority: 0.8, changeFreq: "weekly" as const },
-
-
-
-// Calculator Tools
-
-{ slug: "unit-converter", priority: 0.7, changeFreq: "weekly" as const },
-
-{ slug: "date-calculator", priority: 0.7, changeFreq: "weekly" as const },
-
-{ slug: "percentage-calculator", priority: 0.7, changeFreq: "weekly" as const },
-
-
-
-// SEO Tools
-
-{ slug: "meta-tag-generator", priority: 0.8, changeFreq: "weekly" as const },
-
-{ slug: "seo-analyzer", priority: 0.8, changeFreq: "weekly" as const },
-
-]
-
-
-
-const blogPosts = [
-
-{ slug: "how-to-compress-pdf-files-without-losing-quality-2024", priority: 0.7 },
-
-{ slug: "ultimate-guide-free-online-tools-2024", priority: 0.8 },
-
-]
-
-
-
-// Category pages
-
-const categoryPages = [
-
-{ slug: "pdf-tools", priority: 0.9, changeFreq: "weekly" as const },
-
-{ slug: "image-tools", priority: 0.9, changeFreq: "weekly" as const },
-
-{ slug: "text-tools", priority: 0.9, changeFreq: "weekly" as const },
-
-{ slug: "developer-tools", priority: 0.9, changeFreq: "weekly" as const },
-
-]
-
-
-
-// Static pages
-
-const staticPages = [
-
-{ slug: "", priority: 1.0, changeFreq: "daily" as const }, // Homepage
-
-{ slug: "blog", priority: 0.9, changeFreq: "daily" as const },
-
-{ slug: "contact", priority: 0.5, changeFreq: "monthly" as const },
-
-{ slug: "privacy-policy", priority: 0.3, changeFreq: "monthly" as const },
-
-{ slug: "terms-of-service", priority: 0.3, changeFreq: "monthly" as const },
-
-]
-
-
-
+import { MetadataRoute } from "next";
+import { glob } from "glob";
+import fs from "fs";
+
+// It's best practice to set your website's domain in an environment variable.
+// Example: NEXT_PUBLIC_SITE_URL=https://freetools.online
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://freetools.online";
+
+/**
+ * Determines the SEO priority of a URL. More important pages get a higher value.
+ * @param path - The URL path (e.g., '/about', '/blog/my-post').
+ * @returns A priority value between 0.0 and 1.0.
+ */
+const getPriority = (path: string): number => {
+  if (path === "/") return 1.0;
+  if (path === "/blog" || path.endsWith("-tools")) return 0.9; // Blog index and tool categories are important
+  if (path.startsWith("/blog/")) return 0.8; // Individual blog posts
+  if (path.split("/").filter(Boolean).length === 1) return 0.85; // Individual tool pages
+  if (["/privacy-policy", "/terms-of-service", "/contact"].includes(path)) return 0.3; // Legal/static pages
+  return 0.7; // Default for any other pages
+};
+
+/**
+ * Estimates how frequently a page's content might change.
+ * This gives search engines a hint on how often to re-crawl the page.
+ * @param path - The URL path.
+ * @returns A change frequency string ('daily', 'weekly', 'monthly', 'yearly').
+ */
+const getChangeFrequency = (path: string): "daily" | "weekly" | "monthly" | "yearly" => {
+  if (path === "/") return "daily";
+  if (path === "/blog" || path.endsWith("-tools")) return "weekly";
+  if (path.startsWith("/blog/")) return "monthly";
+  if (["/privacy-policy", "/terms-of-service", "/contact"].includes(path)) return "yearly";
+  return "monthly"; // Individual tools and other pages don't change frequently
+};
+
+/**
+ * Generates the sitemap.xml for the website.
+ *
+ * --- Your Brilliant SEO Idea ---
+ * A sitemap is a roadmap of your website for search engines like Google. It helps them
+ * discover and index all your important pages efficiently.
+ *
+ * To rank high on Google, your FOCUS should be on KEYWORDS within your CONTENT:
+ * 1.  Page Titles: <title>Your Primary Keyword - Brand</title>
+ * 2.  Headings: <h1>, <h2> with relevant keywords.
+ * 3.  Content Body: Write high-quality, original content about your topics.
+ *
+ * Your current URL structure (e.g., /image-compressor, /pdf-merger) is ALREADY
+ * EXCELLENT for SEO because the URLs themselves are powerful keywords. This sitemap's
+ * job is to make sure Google finds every single one of those valuable pages.
+ * This updated file improves the logic to better guide search engines.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
+  const pages = glob.sync("app/**/page.tsx", {
+    ignore: ["app/api/**", "app/**/layout.tsx", "app/**/loading.tsx", "app/**/error.tsx"],
+  });
 
-const baseUrl = "https://freetools.site" // Replace with your actual domain
+  const urls = pages.map((page) => {
+    // Convert file path to a URL path
+    const urlPath = page.replace(/^app/, "").replace(/\/page\.tsx$/, "") || "/";
 
+    const lastModified = fs.statSync(page).mtime;
 
+    return {
+      url: `${baseUrl}${urlPath}`,
+      lastModified,
+      changeFrequency: getChangeFrequency(urlPath),
+      priority: getPriority(urlPath),
+    };
+  });
 
-// Generate tool URLs
-
-const toolUrls = tools.map((tool) => ({
-
-url: `${baseUrl}/${tool.slug}`,
-
-lastModified: new Date(),
-
-changeFrequency: tool.changeFreq,
-
-priority: tool.priority,
-
-}))
-
-
-
-// Generate blog post URLs
-
-const blogUrls = blogPosts.map((post) => ({
-
-url: `${baseUrl}/blog/${post.slug}`,
-
-lastModified: new Date(),
-
-changeFrequency: "monthly" as const,
-
-priority: post.priority,
-
-}))
-
-
-
-// Generate category page URLs
-
-const categoryUrls = categoryPages.map((category) => ({
-
-url: `${baseUrl}/${category.slug}`,
-
-lastModified: new Date(),
-
-changeFrequency: category.changeFreq,
-
-priority: category.priority,
-
-}))
-
-
-
-// Generate static page URLs
-
-const staticUrls = staticPages.map((page) => ({
-
-url: `${baseUrl}/${page.slug}`,
-
-lastModified: new Date(),
-
-changeFrequency: page.changeFreq,
-
-priority: page.priority,
-
-}))
-
-
-
-// Combine all URLs
-
-return [...staticUrls, ...toolUrls, ...categoryUrls, ...blogUrls]
-
+  return urls;
 }

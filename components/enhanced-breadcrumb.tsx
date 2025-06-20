@@ -1,52 +1,62 @@
-import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+"use client";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import JsonLdSchema from "./json-ld-schema";
+import { memo } from "react";
 
 interface BreadcrumbItem {
-  label: string
-  path: string
+  name: string;
+  href: string;
 }
 
-interface BreadcrumbProps {
-  items: BreadcrumbItem[]
+interface EnhancedBreadcrumbProps {
+  items: BreadcrumbItem[];
 }
 
-export function EnhancedBreadcrumb({ items }: BreadcrumbProps) {
-  const structuredData = {
+function EnhancedBreadcrumbComponent({ items }: EnhancedBreadcrumbProps) {
+  const baseUrl = "https://freetools.online";
+
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": items.map((item, index) => ({
+    itemListElement: items.map((item, index) => ({
       "@type": "ListItem",
-      "position": index + 1,
-      "item": {
-        "@id": `https://freetools.site${item.path}`,
-        "name": item.label
-      }
-    }))
-  }
+      position: index + 1,
+      name: item.name,
+      item: `${baseUrl}${item.href}`,
+    })),
+  };
 
   return (
     <>
-      <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-        {items.map((item, index) => (
-          <div key={item.path} className="flex items-center">
-            {index > 0 && <ChevronRight className="h-4 w-4 mx-1" />}
-            {index === items.length - 1 ? (
-              <span className="font-medium text-foreground">{item.label}</span>
-            ) : (
-              <Link 
-                href={item.path}
-                className="hover:text-foreground transition-colors"
-              >
-                {item.label}
+      <JsonLdSchema schema={breadcrumbSchema} />
+      <nav aria-label="breadcrumb" className="mb-4">
+        <ol className="flex items-center space-x-2 text-sm text-gray-500">
+          {items.map((item, index) => (
+            <li key={index} className="flex items-center">
+              <Link href={item.href} className="hover:underline text-blue-600">
+                {item.name}
               </Link>
-            )}
-          </div>
-        ))}
+              {index < items.length - 1 && (
+                <svg
+                  className="h-5 w-5 text-gray-400 mx-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              )}
+            </li>
+          ))}
+        </ol>
       </nav>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
     </>
-  )
+  );
 }
+
+export const EnhancedBreadcrumb = memo(EnhancedBreadcrumbComponent);

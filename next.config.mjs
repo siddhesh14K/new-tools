@@ -1,68 +1,81 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static optimization
-  output: 'standalone',
-  
-  // Optimize images
+  reactStrictMode: true,
+  swcMinify: true,
+  productionBrowserSourceMaps: true,
   images: {
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.example.com",
+      },
+    ],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // 1 week
   },
-
-  // Enable compression
-  compress: true,
-
-  // Security headers
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/:path*",
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            key: "Referrer-Policy",
+            value: "origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
           },
         ],
       },
-    ]
+    ];
   },
-
-  // Redirects for SEO
   async redirects() {
     return [
       {
-        source: '/tools',
-        destination: '/',
+        source: "/old-tool/:path*",
+        destination: "/new-tool/:path*",
         permanent: true,
       },
-    ]
+    ];
   },
+  webpack: (config, { isServer, dev }) => {
+    if (!dev && !isServer) {
+      const CompressionPlugin = require("compression-webpack-plugin");
+      config.plugins.push(
+        new CompressionPlugin({
+          algorithm: "brotliCompress",
+          test: /\.(js|css|html|svg)$/,
+          threshold: 10240,
+          minRatio: 0.8,
+        })
+      );
+    }
 
-  // Enable experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-    scrollRestoration: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-}
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
 
-export default nextConfig
+    return config;
+  },
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
+};
+
+export default nextConfig;
