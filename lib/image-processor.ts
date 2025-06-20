@@ -2,8 +2,33 @@ export interface ImageCompressionOptions {
   quality: number // 0-100
   maxWidth?: number
   maxHeight?: number
-  outputFormat?: 'jpeg' | 'png' | 'webp' | 'auto'
+  outputFormat?: 'jpeg' | 'png' | 'webp' | 'avif' | 'auto'
   maintainAspectRatio?: boolean
+}
+
+export interface ImageResizeOptions {
+  width: number
+  height: number
+  maintainAspectRatio?: boolean
+  mode?: 'exact' | 'fit' | 'fill' | 'cover'
+}
+
+export interface ImageEnhanceOptions {
+  brightness?: number // -100 to 100
+  contrast?: number // -100 to 100
+  saturation?: number // -100 to 100
+}
+
+export interface WatermarkOptions {
+  text: string
+  position: string
+  opacity: number // 0 to 1
+}
+
+export interface AdvancedProcessOptions extends ImageCompressionOptions {
+  autoRotate?: boolean
+  stripMetadata?: boolean
+  progressive?: boolean
 }
 
 export class ImageProcessor {
@@ -222,5 +247,257 @@ export class ImageProcessor {
     } catch {
       return false
     }
+  }
+
+  // New bulk processing methods
+  static async resizeImage(file: File, options: ImageResizeOptions): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+
+      if (!ctx) {
+        reject(new Error('Canvas context not available'))
+        return
+      }
+
+      img.onload = () => {
+        try {
+          let { width: targetWidth, height: targetHeight } = options
+          const { width: originalWidth, height: originalHeight } = img
+
+          if (options.maintainAspectRatio && options.mode !== 'exact') {
+            const aspectRatio = originalWidth / originalHeight
+            
+            switch (options.mode) {
+              case 'fit':
+                if (targetWidth / targetHeight > aspectRatio) {
+                  targetWidth = targetHeight * aspectRatio
+                } else {
+                  targetHeight = targetWidth / aspectRatio
+                }
+                break
+              case 'fill':
+                if (targetWidth / targetHeight < aspectRatio) {
+                  targetWidth = targetHeight * aspectRatio
+                } else {
+                  targetHeight = targetWidth / aspectRatio
+                }
+                break
+              case 'cover':
+                const scale = Math.max(targetWidth / originalWidth, targetHeight / originalHeight)
+                targetWidth = originalWidth * scale
+                targetHeight = originalHeight * scale
+                break
+            }
+          }
+
+          canvas.width = Math.round(targetWidth)
+          canvas.height = Math.round(targetHeight)
+
+          ctx.imageSmoothingEnabled = true
+          ctx.imageSmoothingQuality = 'high'
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Failed to resize image'))
+              }
+            },
+            'image/jpeg',
+            0.9
+          )
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  static async convertFormat(file: File, options: { outputFormat: string; quality: number }): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+
+      if (!ctx) {
+        reject(new Error('Canvas context not available'))
+        return
+      }
+
+      img.onload = () => {
+        try {
+          canvas.width = img.width
+          canvas.height = img.height
+
+          ctx.drawImage(img, 0, 0)
+
+          const mimeType = options.outputFormat === 'jpeg' ? 'image/jpeg' :
+                          options.outputFormat === 'png' ? 'image/png' :
+                          options.outputFormat === 'webp' ? 'image/webp' :
+                          options.outputFormat === 'avif' ? 'image/avif' : 'image/jpeg'
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Failed to convert image format'))
+              }
+            },
+            mimeType,
+            options.quality / 100
+          )
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  static async enhanceImage(file: File, options: ImageEnhanceOptions): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+
+      if (!ctx) {
+        reject(new Error('Canvas context not available'))
+        return
+      }
+
+      img.onload = () => {
+        try {
+          canvas.width = img.width
+          canvas.height = img.height
+
+          // Apply filters
+          let filterString = ''
+          if (options.brightness !== undefined && options.brightness !== 0) {
+            filterString += `brightness(${100 + options.brightness}%) `
+          }
+          if (options.contrast !== undefined && options.contrast !== 0) {
+            filterString += `contrast(${100 + options.contrast}%) `
+          }
+          if (options.saturation !== undefined && options.saturation !== 0) {
+            filterString += `saturate(${100 + options.saturation}%) `
+          }
+
+          ctx.filter = filterString.trim() || 'none'
+          ctx.drawImage(img, 0, 0)
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Failed to enhance image'))
+              }
+            },
+            'image/jpeg',
+            0.9
+          )
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  static async addWatermark(file: File, options: WatermarkOptions): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+
+      if (!ctx) {
+        reject(new Error('Canvas context not available'))
+        return
+      }
+
+      img.onload = () => {
+        try {
+          canvas.width = img.width
+          canvas.height = img.height
+
+          // Draw original image
+          ctx.drawImage(img, 0, 0)
+
+          // Add watermark
+          ctx.globalAlpha = options.opacity
+          ctx.fillStyle = 'white'
+          ctx.strokeStyle = 'black'
+          ctx.lineWidth = 2
+          ctx.font = `${Math.max(16, canvas.width / 40)}px Arial`
+
+          const textMetrics = ctx.measureText(options.text)
+          const textWidth = textMetrics.width
+          const textHeight = parseInt(ctx.font)
+
+          let x = 10, y = canvas.height - 10
+          
+          switch (options.position) {
+            case 'top-left':
+              x = 10
+              y = textHeight + 10
+              break
+            case 'top-right':
+              x = canvas.width - textWidth - 10
+              y = textHeight + 10
+              break
+            case 'bottom-left':
+              x = 10
+              y = canvas.height - 10
+              break
+            case 'bottom-right':
+              x = canvas.width - textWidth - 10
+              y = canvas.height - 10
+              break
+            case 'center':
+              x = (canvas.width - textWidth) / 2
+              y = canvas.height / 2
+              break
+          }
+
+          ctx.strokeText(options.text, x, y)
+          ctx.fillText(options.text, x, y)
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Failed to add watermark'))
+              }
+            },
+            'image/jpeg',
+            0.9
+          )
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      img.onerror = () => reject(new Error('Failed to load image'))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  static async advancedProcess(file: File, options: AdvancedProcessOptions): Promise<Blob> {
+    // For now, just apply compression with the advanced options
+    // In a real implementation, you'd handle EXIF rotation, metadata stripping, etc.
+    return this.compressImage(file, options)
   }
 }

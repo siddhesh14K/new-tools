@@ -16,9 +16,9 @@ const categories = [
   {
     name: "Image Tools",
     icon: ImageIcon,
-    count: 12,
+    count: 13,
     description: "Edit, compress, resize images",
-    tools: ["Image Compressor", "Background Remover", "Image Resizer", "Format Converter"],
+    tools: ["Bulk Image Editor", "Image Compressor", "Background Remover", "Image Resizer"],
     href: "/image-tools",
     color: "text-green-500",
     bgColor: "bg-green-50",

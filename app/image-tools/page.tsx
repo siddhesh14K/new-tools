@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ImageIcon, Scissors, Palette, RotateCw, Crop, Zap } from "lucide-react"
+import { ImageIcon, Scissors, Palette, RotateCw, Crop, Zap, Layers } from "lucide-react"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { ToolLayout } from "@/components/tool-layout"
 
@@ -14,6 +14,15 @@ export const metadata: Metadata = {
 }
 
 const imageTools = [
+  {
+    name: "Bulk Image Editor",
+    description: "Process hundreds of images at once - resize, compress, convert, enhance",
+    icon: Layers,
+    href: "/bulk-image-editor",
+    color: "text-blue-500",
+    features: ["100 images at once", "Multiple operations", "All formats", "Lightning fast"],
+    popular: true,
+  },
   {
     name: "Image Compressor",
     description: "Compress images up to 80% without visible quality loss",
@@ -184,6 +193,9 @@ export default function ImageToolsPage() {
 
           <h3>🎯 Most Popular Image Tools</h3>
           <ul>
+            <li>
+              <strong>Bulk Image Editor (NEW!):</strong> Process up to 100 images simultaneously with resize, compress, convert, and enhance operations
+            </li>
             <li>
               <strong>Image Compressor:</strong> Reduce file size by up to 80% while maintaining visual quality
             </li>

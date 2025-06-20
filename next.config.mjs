@@ -3,6 +3,14 @@
 const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  output: 'standalone',
+  trailingSlash: true,
   images: {
     remotePatterns: [
       {

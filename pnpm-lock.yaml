@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@capacitor/android':
+        specifier: ^7.4.0
+        version: 7.4.0(@capacitor/core@7.4.0)
       '@radix-ui/react-accordion':
         specifier: latest
         version: 1.2.11(@types/react-dom@18.2.0)(@types/react@18.2.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -145,6 +148,14 @@ packages:
   '@babel/runtime@7.27.6':
     resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
     engines: {node: '>=6.9.0'}
+
+  '@capacitor/android@7.4.0':
+    resolution: {integrity: sha512-HVCQsnUobviGt/MR5qCfXsfkSyZ5gjJVW6Jbn0CI5NHhsvUkBtazGjaMjdt5JueIz1pfKXpiuZc/njfRHwjx6Q==}
+    peerDependencies:
+      '@capacitor/core': ^7.4.0
+
+  '@capacitor/core@7.4.0':
+    resolution: {integrity: sha512-P6NnjoHyobZgTjynlZSn27d0SUj6j38inlNxFnKZr9qwU7/r6+0Sg2nWkGkIH/pMmXHsvGD8zVe6KUq1UncIjA==}
 
   '@emnapi/core@1.4.3':
     resolution: {integrity: sha512-4m62DuCE07lw01soJwPiBGC0nAww0Q+RY70VZ+n49yDIO13yyinhbWCeNnaob0lakDtWQzSdtNWzJeOJt2ma+g==}
@@ -3309,6 +3320,14 @@ snapshots:
   '@alloc/quick-lru@5.2.0': {}
 
   '@babel/runtime@7.27.6': {}
+
+  '@capacitor/android@7.4.0(@capacitor/core@7.4.0)':
+    dependencies:
+      '@capacitor/core': 7.4.0
+
+  '@capacitor/core@7.4.0':
+    dependencies:
+      tslib: 2.8.1
 
   '@emnapi/core@1.4.3':
     dependencies:

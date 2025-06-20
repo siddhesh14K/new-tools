@@ -51,6 +51,8 @@ const getChangeFrequency = (path: string): "daily" | "weekly" | "monthly" | "yea
  * job is to make sure Google finds every single one of those valuable pages.
  * This updated file improves the logic to better guide search engines.
  */
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = glob.sync("app/**/page.tsx", {
     ignore: ["app/api/**", "app/**/layout.tsx", "app/**/loading.tsx", "app/**/error.tsx"],

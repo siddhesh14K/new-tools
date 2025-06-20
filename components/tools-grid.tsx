@@ -17,6 +17,8 @@ import {
   Scissors,
   Settings,
   Search,
+  Download,
+  Layers,
 } from "lucide-react"
 
 const tools = [
@@ -29,6 +31,7 @@ const tools = [
     category: "PDF",
     color: "text-red-500",
     status: "working",
+    featured: false,
   },
   {
     name: "PDF Merger",
@@ -38,6 +41,7 @@ const tools = [
     category: "PDF",
     color: "text-red-600",
     status: "working",
+    featured: false,
   },
   {
     name: "PDF Splitter",
@@ -47,9 +51,20 @@ const tools = [
     category: "PDF",
     color: "text-red-700",
     status: "working",
+    featured: false,
   },
 
   // Image Tools
+  {
+    name: "Bulk Image Editor",
+    description: "Process hundreds of images at once - resize, compress, convert",
+    icon: Layers,
+    href: "/bulk-image-editor",
+    category: "Image",
+    color: "text-blue-500",
+    status: "working",
+    featured: true,
+  },
   {
     name: "Image Compressor",
     description: "Compress images without quality loss",
@@ -58,6 +73,7 @@ const tools = [
     category: "Image",
     color: "text-green-500",
     status: "working",
+    featured: true,
   },
   {
     name: "Image Resizer",
@@ -67,6 +83,7 @@ const tools = [
     category: "Image",
     color: "text-green-600",
     status: "working",
+    featured: false,
   },
   {
     name: "Background Remover",
@@ -76,6 +93,7 @@ const tools = [
     category: "Image",
     color: "text-green-700",
     status: "working",
+    featured: false,
   },
 
   // Text Tools
@@ -87,6 +105,7 @@ const tools = [
     category: "Text",
     color: "text-blue-500",
     status: "working",
+    featured: false,
   },
   {
     name: "Case Converter",
@@ -96,6 +115,7 @@ const tools = [
     category: "Text",
     color: "text-blue-600",
     status: "working",
+    featured: false,
   },
   {
     name: "Text Formatter",
@@ -105,6 +125,7 @@ const tools = [
     category: "Text",
     color: "text-blue-700",
     status: "working",
+    featured: false,
   },
   {
     name: "Lorem Generator",
@@ -114,6 +135,7 @@ const tools = [
     category: "Text",
     color: "text-purple-500",
     status: "working",
+    featured: false,
   },
 
   // Developer Tools
@@ -125,6 +147,7 @@ const tools = [
     category: "Developer",
     color: "text-yellow-500",
     status: "working",
+    featured: false,
   },
   {
     name: "JSON Formatter",
@@ -134,6 +157,7 @@ const tools = [
     category: "Developer",
     color: "text-emerald-500",
     status: "working",
+    featured: true,
   },
   {
     name: "Hash Generator",
@@ -143,6 +167,7 @@ const tools = [
     category: "Utility",
     color: "text-orange-500",
     status: "working",
+    featured: false,
   },
 
   // Utility Tools
@@ -154,6 +179,7 @@ const tools = [
     category: "Security",
     color: "text-red-500",
     status: "working",
+    featured: true,
   },
   {
     name: "QR Code Generator",
@@ -163,6 +189,7 @@ const tools = [
     category: "Utility",
     color: "text-indigo-500",
     status: "working",
+    featured: false,
   },
   {
     name: "Color Picker",
@@ -172,6 +199,7 @@ const tools = [
     category: "Design",
     color: "text-pink-500",
     status: "working",
+    featured: false,
   },
   {
     name: "URL Shortener",
@@ -181,6 +209,7 @@ const tools = [
     category: "Utility",
     color: "text-cyan-500",
     status: "working",
+    featured: false,
   },
 
   // Calculator Tools
@@ -192,6 +221,7 @@ const tools = [
     category: "Calculator",
     color: "text-amber-500",
     status: "working",
+    featured: false,
   },
   {
     name: "Date Calculator",
@@ -201,6 +231,7 @@ const tools = [
     category: "Calculator",
     color: "text-violet-500",
     status: "working",
+    featured: false,
   },
   {
     name: "Percentage Calculator",
@@ -210,6 +241,7 @@ const tools = [
     category: "Calculator",
     color: "text-rose-500",
     status: "working",
+    featured: false,
   },
 
   // SEO Tools
@@ -221,6 +253,7 @@ const tools = [
     category: "SEO",
     color: "text-green-400",
     status: "working",
+    featured: false,
   },
   {
     name: "SEO Analyzer",
@@ -230,20 +263,57 @@ const tools = [
     category: "SEO",
     color: "text-green-500",
     status: "working",
+    featured: false,
+  },
+
+  // Social Media Tools
+  {
+    name: "YouTube Thumbnail Downloader",
+    description: "Download YouTube video thumbnails in high quality",
+    icon: Download,
+    href: "/youtube-thumbnail-downloader",
+    category: "Social Media",
+    color: "text-red-500",
+    status: "working",
+    featured: false,
   },
 ]
 
-export function ToolsGrid() {
+interface Tool {
+  title?: string
+  name?: string
+  description: string
+  href: string
+  icon: any
+  category: string
+  color?: string
+  featured?: boolean
+  keywords?: string[]
+  status?: string
+}
+
+interface ToolsGridProps {
+  tools?: Tool[]
+}
+
+export function ToolsGrid({ tools: propTools }: ToolsGridProps = {}) {
+  const toolsToRender = propTools || tools
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {tools.map((tool, index) => (
+      {toolsToRender.map((tool, index) => (
         <Link key={tool.href} href={tool.href}>
           <Card className="h-full hover:shadow-lg transition-all duration-200 group cursor-pointer relative">
-            <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">✓ Working</div>
+            {tool.featured && (
+              <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded">⭐ Featured</div>
+            )}
+            {tool.status === "working" && !tool.featured && (
+              <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">✓ Working</div>
+            )}
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-3">
                 <div className="bg-background border rounded-lg p-2 group-hover:scale-110 transition-transform">
-                  <tool.icon className={`h-6 w-6 ${tool.color}`} />
+                  <tool.icon className={`h-6 w-6 ${tool.color || 'text-primary'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <CardTitle className="text-lg leading-tight">{tool.name}</CardTitle>
