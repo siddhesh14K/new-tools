@@ -3,8 +3,8 @@ import { glob } from "glob";
 import fs from "fs";
 
 // It's best practice to set your website's domain in an environment variable.
-// Example: NEXT_PUBLIC_SITE_URL=https://freetools.online
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://freetools.online";
+// Example: NEXT_PUBLIC_SITE_URL=https://new-tools-ochre.vercel.app
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://new-tools-ochre.vercel.app";
 
 /**
  * Determines the SEO priority of a URL. More important pages get a higher value.

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://freetools.online";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://new-tools-ochre.vercel.app";
 
   return {
     rules: [

@@ -11,7 +11,7 @@ import { Suspense } from "react"
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://freetools.site"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://new-tools-ochre.vercel.app"),
   title: {
     default: "Free Online Tools 2024 - 100+ PDF, Image, Text, Video, SEO Tools | FreeTools.online",
     template: "%s | FreeTools.online - Free Online Tools 2024",
