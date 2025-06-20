@@ -185,6 +185,50 @@ export default function ImageResizerPage() {
       title="Image Resizer - Resize Images Online Free"
       description="Resize images online for free. Change image dimensions for social media, web, print. Maintain aspect ratio or custom resize. Support JPG, PNG, WebP formats."
       icon={<ImageIcon className="h-8 w-8 text-green-600" />}
+      toolCategory="image-editing"
+      howToSteps={[
+        {
+          name: "Upload Image",
+          text: "Select or drag and drop your image file (JPG, PNG, WebP up to 10MB)"
+        },
+        {
+          name: "Set Dimensions",
+          text: "Enter new width and height, or choose from preset sizes"
+        },
+        {
+          name: "Choose Resize Mode",
+          text: "Select to maintain aspect ratio or use custom dimensions"
+        },
+        {
+          name: "Download Result",
+          text: "Click 'Resize Image' and download your resized image"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What image formats are supported?",
+          answer: "We support JPG, JPEG, PNG, and WebP image formats up to 10MB in size."
+        },
+        {
+          question: "Will resizing affect image quality?",
+          answer: "Enlarging images may reduce quality, but our tool uses high-quality algorithms to minimize quality loss. Reducing size typically maintains good quality."
+        },
+        {
+          question: "What does 'maintain aspect ratio' mean?",
+          answer: "This keeps the image proportions the same, preventing distortion. If you change width, height adjusts automatically and vice versa."
+        },
+        {
+          question: "Can I resize multiple images at once?",
+          answer: "Currently, you can resize one image at a time. For batch processing, you'll need to resize each image individually."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Image Tools", path: "/image-tools" },
+        { label: "Image Resizer", path: "/image-resizer" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-6">
         {/* Upload Area */}

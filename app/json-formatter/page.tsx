@@ -91,19 +91,55 @@ export default function JsonFormatterPage() {
     URL.revokeObjectURL(url)
   }
 
-  const howToUse = [
-    "Paste or type your JSON data in the input field",
-    'Click "Format" to beautify or "Minify" to compress',
-    "Copy the result or download as a file",
-    'Use "Clear" to start over with new data',
-  ]
-
   return (
     <ToolLayout
-      title="JSON Formatter"
-      description="Format, validate and beautify JSON data instantly"
+      title="JSON Formatter - Format & Validate JSON Online Free"
+      description="Format, validate and beautify JSON data instantly. Perfect for developers, API testing, and data processing."
       icon={<FileText className="h-8 w-8 text-blue-500" />}
-      howToUse={howToUse}
+      toolCategory="developer-tools"
+      howToSteps={[
+        {
+          name: "Paste JSON Data",
+          text: "Paste or type your JSON data in the input field"
+        },
+        {
+          name: "Choose Format",
+          text: 'Click "Format" to beautify or "Minify" to compress'
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy the result or download as a file"
+        },
+        {
+          name: "Clear and Repeat",
+          text: 'Use "Clear" to start over with new data'
+        }
+      ]}
+      faqs={[
+        {
+          question: "What is JSON formatting?",
+          answer: "JSON formatting (beautifying) adds proper indentation, line breaks, and spacing to make JSON data more readable and easier to debug."
+        },
+        {
+          question: "What's the difference between beautify and minify?",
+          answer: "Beautify adds formatting for readability, while minify removes all unnecessary whitespace to reduce file size for production use."
+        },
+        {
+          question: "Can this tool validate JSON syntax?",
+          answer: "Yes, our JSON formatter automatically validates your JSON and shows clear error messages if there are syntax issues."
+        },
+        {
+          question: "Is my JSON data secure?",
+          answer: "Yes, all JSON processing happens locally in your browser. Your data is never sent to our servers."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Developer Tools", path: "/developer-tools" },
+        { label: "JSON Formatter", path: "/json-formatter" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-4">
         {/* Input Section */}

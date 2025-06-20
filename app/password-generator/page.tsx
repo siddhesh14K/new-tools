@@ -129,9 +129,53 @@ export default function PasswordGeneratorPage() {
 
   return (
     <ToolLayout
-      title="Secure Password Generator"
-      description="Generate strong, secure passwords with customizable options. Create unbreakable passwords for your accounts."
+      title="Secure Password Generator - Create Strong Passwords Online Free"
+      description="Generate strong, secure passwords with customizable options. Create unbreakable passwords for your accounts with advanced security features."
       icon={<Lock className="h-8 w-8 text-red-500" />}
+      toolCategory="security-tools"
+      howToSteps={[
+        {
+          name: "Set Password Length",
+          text: "Choose your desired password length (8-128 characters)"
+        },
+        {
+          name: "Select Character Types",
+          text: "Choose which character types to include: uppercase, lowercase, numbers, symbols"
+        },
+        {
+          name: "Generate Password",
+          text: "Click 'Generate Password' to create a secure password"
+        },
+        {
+          name: "Copy and Use",
+          text: "Copy the generated password and use it for your accounts"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How long should my password be?",
+          answer: "We recommend at least 12-16 characters for strong security. Longer passwords are exponentially harder to crack."
+        },
+        {
+          question: "Should I include symbols in my password?",
+          answer: "Yes, including symbols significantly increases password strength by expanding the character set that attackers must consider."
+        },
+        {
+          question: "How often should I change my passwords?",
+          answer: "Change passwords immediately if there's a security breach, otherwise every 3-6 months for important accounts."
+        },
+        {
+          question: "Is it safe to generate passwords online?",
+          answer: "Yes, our password generator works entirely in your browser. Passwords are generated locally and never sent to our servers."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Security Tools", path: "/security-tools" },
+        { label: "Password Generator", path: "/password-generator" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-6">
         {/* Generated Password */}

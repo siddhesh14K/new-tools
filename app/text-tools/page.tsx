@@ -75,6 +75,50 @@ export default function TextToolsPage() {
     <ToolLayout
       title="Free Text Tools Online 2024"
       description="Professional text processing tools for writers, editors, and content creators. Count words, convert cases, generate Lorem Ipsum, and more."
+      icon={<Type className="h-8 w-8 text-blue-500" />}
+      toolCategory="text-tools"
+      howToSteps={[
+        {
+          name: "Choose Your Tool",
+          text: "Browse our collection of text tools and select the one you need"
+        },
+        {
+          name: "Input Your Text",
+          text: "Enter or paste your text into the tool"
+        },
+        {
+          name: "Process Text",
+          text: "Use the tool's features to process, format, or analyze your text"
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy the results or download them as a file"
+        }
+      ]}
+      faqs={[
+        {
+          question: "Are these text tools free to use?",
+          answer: "Yes, all our text tools are completely free to use with no registration required. They work entirely in your browser."
+        },
+        {
+          question: "Do you store my text data?",
+          answer: "No, all text processing happens locally in your browser. Your text is never sent to our servers or stored anywhere."
+        },
+        {
+          question: "Which text tools are most popular?",
+          answer: "Our most popular tools are the Word Counter, Case Converter, Lorem Ipsum Generator, and Text Formatter."
+        },
+        {
+          question: "Can I use these tools on mobile devices?",
+          answer: "Yes, all our text tools are mobile-friendly and work perfectly on smartphones and tablets."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Text Tools", path: "/text-tools" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Breadcrumb

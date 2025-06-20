@@ -75,6 +75,50 @@ export default function ImageToolsPage() {
     <ToolLayout
       title="Free Image Tools Online 2024"
       description="Professional image editing tools that work in your browser. Compress, resize, edit, and convert images without installing software."
+      icon={<ImageIcon className="h-8 w-8 text-green-500" />}
+      toolCategory="image-editing"
+      howToSteps={[
+        {
+          name: "Choose Your Tool",
+          text: "Browse our collection of image tools and select the one you need"
+        },
+        {
+          name: "Upload Images",
+          text: "Select or drag and drop your image files"
+        },
+        {
+          name: "Edit & Process",
+          text: "Use the tool's features to edit, compress, resize, or convert your images"
+        },
+        {
+          name: "Download Results",
+          text: "Save your processed images to your device"
+        }
+      ]}
+      faqs={[
+        {
+          question: "Are these image tools free to use?",
+          answer: "Yes, all our image tools are completely free to use with no registration required. They work entirely in your browser."
+        },
+        {
+          question: "What image formats are supported?",
+          answer: "We support all major image formats including JPG, PNG, WebP, GIF, and more. Each tool may have specific format requirements."
+        },
+        {
+          question: "Is there a file size limit?",
+          answer: "Most tools support images up to 10MB in size. This covers the vast majority of use cases for web and print."
+        },
+        {
+          question: "Do you store my images?",
+          answer: "No, all image processing happens locally in your browser. Your images are never uploaded to our servers."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Image Tools", path: "/image-tools" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Breadcrumb

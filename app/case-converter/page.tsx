@@ -78,9 +78,53 @@ export default function CaseConverterPage() {
 
   return (
     <ToolLayout
-      title="Case Converter"
-      description="Convert text to different cases: uppercase, lowercase, title case, camelCase, snake_case, kebab-case and more."
+      title="Case Converter - Convert Text Case Online Free"
+      description="Convert text to different cases: uppercase, lowercase, title case, camelCase, snake_case, kebab-case and more. Perfect for developers and writers."
       icon={<Type className="h-8 w-8 text-blue-600" />}
+      toolCategory="text-tools"
+      howToSteps={[
+        {
+          name: "Enter Text",
+          text: "Type or paste your text into the input area"
+        },
+        {
+          name: "View Conversions",
+          text: "All case conversions will appear automatically as you type"
+        },
+        {
+          name: "Copy Results",
+          text: "Click the copy button next to any conversion to copy it to clipboard"
+        },
+        {
+          name: "Download Files",
+          text: "Use download buttons to save individual conversions or all at once"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What case types are supported?",
+          answer: "We support 12 different case types including uppercase, lowercase, title case, camelCase, PascalCase, snake_case, kebab-case, dot.case, CONSTANT_CASE, alternating case, and inverse case."
+        },
+        {
+          question: "What is camelCase?",
+          answer: "camelCase is a naming convention where the first word is lowercase and subsequent words start with uppercase letters, with no spaces or punctuation."
+        },
+        {
+          question: "When should I use snake_case?",
+          answer: "snake_case is commonly used in Python, database column names, and configuration files where words are separated by underscores."
+        },
+        {
+          question: "Can I convert multiple texts at once?",
+          answer: "Currently, you can convert one text at a time, but you can download all case conversions together using the 'Download All' button."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Text Tools", path: "/text-tools" },
+        { label: "Case Converter", path: "/case-converter" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-6">
         {/* Input Section */}

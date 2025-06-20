@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { FileText, Upload, Download, Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { PDFProcessor } from "@/lib/pdf-processor"
 
 interface PDFFile {
   file: File
@@ -78,42 +79,15 @@ export default function PDFMergerPage() {
     setError("")
 
     try {
-      // Simulate PDF merging process
-      const progressSteps = [
-        { progress: 20, message: "Reading PDF files..." },
-        { progress: 40, message: "Analyzing document structure..." },
-        { progress: 60, message: "Merging pages..." },
-        { progress: 80, message: "Optimizing merged document..." },
-        { progress: 95, message: "Finalizing PDF..." },
-      ]
+      // Use the real PDF processor
+      const fileObjects = files.map(f => f.file)
+      const mergedBlob = await PDFProcessor.mergePDFs(fileObjects, (progress) => {
+        setProgress(progress)
+      })
 
-      for (const step of progressSteps) {
-        await new Promise((resolve) => setTimeout(resolve, 800))
-        setProgress(step.progress)
-      }
-
-      // Create merged PDF (simulation)
-      const totalSize = files.reduce((sum, file) => sum + file.file.size, 0)
-      const mergedArrayBuffer = new ArrayBuffer(totalSize)
-
-      // Add PDF header
-      const pdfHeader = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34]) // %PDF-1.4
-      const mergedData = new Uint8Array(mergedArrayBuffer.byteLength + pdfHeader.length)
-      mergedData.set(pdfHeader)
-
-      // Simulate merging by combining file data
-      let offset = pdfHeader.length
-      for (const pdfFile of files) {
-        const arrayBuffer = await pdfFile.file.arrayBuffer()
-        mergedData.set(new Uint8Array(arrayBuffer), offset)
-        offset += arrayBuffer.byteLength
-      }
-
-      const mergedBlob = new Blob([mergedData], { type: "application/pdf" })
       setMergedFile(mergedBlob)
-      setProgress(100)
     } catch (err) {
-      setError("Failed to merge PDFs. Please try again.")
+      setError(err instanceof Error ? err.message : "Failed to merge PDFs. Please try again.")
       console.error(err)
     } finally {
       setMerging(false)
@@ -122,15 +96,7 @@ export default function PDFMergerPage() {
 
   const downloadMerged = () => {
     if (!mergedFile) return
-
-    const url = URL.createObjectURL(mergedFile)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `merged_document_${Date.now()}.pdf`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    PDFProcessor.downloadBlob(mergedFile, `merged_document_${Date.now()}.pdf`)
   }
 
   const reset = () => {
@@ -141,11 +107,7 @@ export default function PDFMergerPage() {
   }
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+    return PDFProcessor.formatFileSize(bytes)
   }
 
   return (
@@ -153,6 +115,50 @@ export default function PDFMergerPage() {
       title="PDF Merger - Combine Multiple PDFs Online Free"
       description="Merge multiple PDF files into one document online for free. Combine PDFs in any order, no registration required. Fast and secure PDF merging tool."
       icon={<FileText className="h-8 w-8 text-red-600" />}
+      toolCategory="pdf-tools"
+      howToSteps={[
+        {
+          name: "Upload PDF Files",
+          text: "Select multiple PDF files or drag and drop them into the upload area"
+        },
+        {
+          name: "Arrange Order",
+          text: "Drag and drop to reorder your PDF files in the desired sequence"
+        },
+        {
+          name: "Merge PDFs",
+          text: "Click 'Merge PDFs' to combine all files into one document"
+        },
+        {
+          name: "Download Result",
+          text: "Download your merged PDF file to your device"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How many PDF files can I merge at once?",
+          answer: "You can merge multiple PDF files at once. The exact limit depends on file sizes, but typically you can merge 10-20 files without issues."
+        },
+        {
+          question: "Can I change the order of PDFs before merging?",
+          answer: "Yes, you can drag and drop the uploaded PDF files to rearrange them in any order before merging."
+        },
+        {
+          question: "What's the maximum file size for each PDF?",
+          answer: "Each PDF file can be up to 25MB in size. This covers most documents, reports, and presentations."
+        },
+        {
+          question: "Is my data secure during the merge process?",
+          answer: "Yes, all PDF processing happens locally in your browser. Your files are never uploaded to our servers."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "PDF Tools", path: "/pdf-tools" },
+        { label: "PDF Merger", path: "/pdf-merger" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT2M"
     >
       <div className="space-y-6">
         {/* Upload Area */}

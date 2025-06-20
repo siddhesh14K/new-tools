@@ -243,9 +243,53 @@ export default function LoremGeneratorPage() {
 
   return (
     <ToolLayout
-      title="Lorem Ipsum Generator"
+      title="Lorem Ipsum Generator - Generate Placeholder Text Online Free"
       description="Generate Lorem Ipsum placeholder text for your designs and layouts. Create words, sentences, paragraphs, and lists instantly."
       icon={<Type className="h-8 w-8 text-purple-500" />}
+      toolCategory="text-tools"
+      howToSteps={[
+        {
+          name: "Choose Text Type",
+          text: "Select whether you want words, sentences, paragraphs, or lists"
+        },
+        {
+          name: "Set Amount",
+          text: "Specify how many units of text you need"
+        },
+        {
+          name: "Generate Text",
+          text: "Click 'Generate' to create your Lorem Ipsum text"
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy the generated text or download it as a file"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What is Lorem Ipsum?",
+          answer: "Lorem Ipsum is placeholder text used in the printing and typesetting industry. It's derived from Latin text and has been used since the 1500s."
+        },
+        {
+          question: "Why use Lorem Ipsum instead of regular text?",
+          answer: "Lorem Ipsum is meaningless text that won't distract from design elements. It helps focus on layout, typography, and visual design rather than content."
+        },
+        {
+          question: "Can I generate different amounts of text?",
+          answer: "Yes, you can generate anywhere from a few words to multiple paragraphs, depending on your design needs."
+        },
+        {
+          question: "Is the generated text always the same?",
+          answer: "No, our generator creates varied Lorem Ipsum text each time, though it follows the traditional Latin-based structure."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Text Tools", path: "/text-tools" },
+        { label: "Lorem Generator", path: "/lorem-generator" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-6">
         {/* Generator Settings */}

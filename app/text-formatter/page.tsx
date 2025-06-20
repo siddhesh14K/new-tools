@@ -146,6 +146,50 @@ export default function TextFormatterPage() {
       title="Text Formatter - Format and Clean Text Online Free"
       description="Format, clean, and organize text online for free. Remove extra spaces, line breaks, special characters, sort lines, add line numbers and more."
       icon={<Type className="h-8 w-8 text-blue-700" />}
+      toolCategory="text-tools"
+      howToSteps={[
+        {
+          name: "Paste Your Text",
+          text: "Enter or paste the text you want to format in the input area"
+        },
+        {
+          name: "Choose Formatting Options",
+          text: "Select the formatting operations you want to apply"
+        },
+        {
+          name: "Apply Formatting",
+          text: "Click the formatting buttons to clean and organize your text"
+        },
+        {
+          name: "Copy Results",
+          text: "Copy the formatted text or download it as a file"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What text formatting options are available?",
+          answer: "You can remove extra spaces, trim lines, remove line breaks, sort lines, add line numbers, remove special characters, and more."
+        },
+        {
+          question: "Can I apply multiple formatting operations at once?",
+          answer: "Yes, you can apply multiple formatting operations in sequence to achieve the exact text format you need."
+        },
+        {
+          question: "Is there a limit to how much text I can format?",
+          answer: "There's no strict limit, but very large texts may take longer to process. The tool works best with typical document sizes."
+        },
+        {
+          question: "Can I undo formatting changes?",
+          answer: "The tool processes text in real-time. To undo changes, you can paste your original text again or use your browser's undo function."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Text Tools", path: "/text-tools" },
+        { label: "Text Formatter", path: "/text-formatter" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-6">
         {/* Input Section */}

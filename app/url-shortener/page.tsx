@@ -136,6 +136,50 @@ export default function URLShortenerPage() {
       title="URL Shortener - Shorten Long URLs Online Free"
       description="Shorten long URLs for free with custom aliases and click tracking. Perfect for social media, email campaigns, and link sharing. No registration required."
       icon={<LinkIcon className="h-8 w-8 text-cyan-500" />}
+      toolCategory="utility-tools"
+      howToSteps={[
+        {
+          name: "Enter Long URL",
+          text: "Paste the long URL you want to shorten into the input field"
+        },
+        {
+          name: "Add Custom Alias (Optional)",
+          text: "Optionally add a custom alias to make your short URL more memorable"
+        },
+        {
+          name: "Generate Short URL",
+          text: "Click 'Shorten URL' to create your shortened link"
+        },
+        {
+          name: "Copy and Share",
+          text: "Copy your short URL and share it anywhere you need"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How long do shortened URLs last?",
+          answer: "Our shortened URLs are permanent and will continue to work indefinitely, as long as the original URL remains active."
+        },
+        {
+          question: "Can I customize my short URL?",
+          answer: "Yes, you can add a custom alias to make your short URL more memorable and branded."
+        },
+        {
+          question: "Do you track clicks on shortened URLs?",
+          answer: "We provide basic click tracking to show you how many times your shortened URL has been accessed."
+        },
+        {
+          question: "Is there a limit to how many URLs I can shorten?",
+          answer: "No, you can shorten as many URLs as you need. Our service is completely free with no limits."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Utility Tools", path: "/utility-tools" },
+        { label: "URL Shortener", path: "/url-shortener" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-6">
         {/* URL Shortening Form */}

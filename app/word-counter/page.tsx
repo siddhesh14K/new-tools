@@ -40,13 +40,6 @@ export default function WordCounterPage() {
     calculateStats()
   }, [text])
 
-  const howToUse = [
-    "Type or paste your text in the input area",
-    "View real-time statistics as you type",
-    "Get word count, character count, and reading time",
-    "Perfect for essays, articles, and social media posts",
-  ]
-
   const statCards = [
     { label: "Words", value: stats.words, color: "text-blue-500" },
     { label: "Characters", value: stats.characters, color: "text-green-500" },
@@ -98,10 +91,53 @@ export default function WordCounterPage() {
 
   return (
     <ToolLayout
-      title="Word Counter"
-      description="Count words, characters, and analyze text in real-time"
+      title="Word Counter - Count Words & Characters Online Free"
+      description="Count words, characters, and analyze text in real-time. Perfect for essays, articles, social media posts, and content creation."
       icon={<Calculator className="h-8 w-8 text-green-500" />}
-      howToUse={howToUse}
+      toolCategory="text-tools"
+      howToSteps={[
+        {
+          name: "Enter Your Text",
+          text: "Type or paste your text in the input area"
+        },
+        {
+          name: "View Statistics",
+          text: "See real-time word count, character count, and other statistics"
+        },
+        {
+          name: "Analyze Text",
+          text: "Review detailed analysis including reading time and text density"
+        },
+        {
+          name: "Download Report",
+          text: "Download a detailed analysis report of your text"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How is reading time calculated?",
+          answer: "Reading time is calculated based on an average reading speed of 200 words per minute, which is the standard for adult readers."
+        },
+        {
+          question: "What counts as a word?",
+          answer: "Words are counted as sequences of characters separated by spaces. Numbers, abbreviations, and contractions each count as one word."
+        },
+        {
+          question: "How are sentences counted?",
+          answer: "Sentences are counted by identifying text segments that end with periods, exclamation marks, or question marks."
+        },
+        {
+          question: "Can I analyze very long texts?",
+          answer: "Yes, there's no limit to the text length you can analyze. The tool works efficiently with documents of any size."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Text Tools", path: "/text-tools" },
+        { label: "Word Counter", path: "/word-counter" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-4">
         {/* Text Input */}

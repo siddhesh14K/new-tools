@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CopyButton } from "@/components/copy-button"
 import { ToolLayout } from "@/components/tool-layout"
 import { Badge } from "@/components/ui/badge"
-import { Globe, Share2, Search, Twitter, Facebook } from "lucide-react"
+import { Globe, Share2, Search, Twitter, Facebook, Code } from "lucide-react"
 
 interface MetaTags {
   title: string
@@ -151,7 +151,55 @@ export default function MetaTagGenerator() {
   }
 
   return (
-    <ToolLayout title="Meta Tag Generator" description="Generate comprehensive HTML meta tags for SEO optimization">
+    <ToolLayout 
+      title="Meta Tag Generator - Generate HTML Meta Tags for SEO"
+      description="Generate comprehensive HTML meta tags for SEO optimization. Create Open Graph, Twitter Cards, and essential meta tags for better search rankings."
+      icon={<Code className="h-8 w-8 text-blue-500" />}
+      toolCategory="seo-tools"
+      howToSteps={[
+        {
+          name: "Enter Website Details",
+          text: "Fill in your website title, description, URL, and other basic information"
+        },
+        {
+          name: "Add Social Media Info",
+          text: "Configure Open Graph and Twitter Card settings for social sharing"
+        },
+        {
+          name: "Generate Meta Tags",
+          text: "Click 'Generate Meta Tags' to create your HTML meta tags"
+        },
+        {
+          name: "Copy and Use",
+          text: "Copy the generated meta tags and paste them in your HTML <head> section"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What are meta tags and why are they important?",
+          answer: "Meta tags provide information about your webpage to search engines and social media platforms. They're crucial for SEO and how your content appears when shared."
+        },
+        {
+          question: "Which meta tags are most important for SEO?",
+          answer: "The most important are title, description, viewport, Open Graph tags, and Twitter Card tags. These directly impact search rankings and social sharing."
+        },
+        {
+          question: "How do I add these meta tags to my website?",
+          answer: "Copy the generated meta tags and paste them inside the <head> section of your HTML document, before the closing </head> tag."
+        },
+        {
+          question: "Do I need different meta tags for each page?",
+          answer: "Yes, each page should have unique title and description meta tags that accurately describe that specific page's content."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "SEO Tools", path: "/seo-tools" },
+        { label: "Meta Tag Generator", path: "/meta-tag-generator" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT3M"
+    >
       <div className="space-y-6">
         {/* Templates */}
         <Card>

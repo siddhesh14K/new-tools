@@ -1,10 +1,7 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   productionBrowserSourceMaps: true,
   images: {
     remotePatterns: [
@@ -54,18 +51,9 @@ const nextConfig = {
     ];
   },
   webpack: (config, { isServer, dev }) => {
-    if (!dev && !isServer) {
-      const CompressionPlugin = require("compression-webpack-plugin");
-      config.plugins.push(
-        new CompressionPlugin({
-          algorithm: "brotliCompress",
-          test: /\.(js|css|html|svg)$/,
-          threshold: 10240,
-          minRatio: 0.8,
-        })
-      );
-    }
-
+    // Remove compression plugin for now to avoid require() issues
+    // You can add it back with proper ES module imports if needed
+    
     config.module.rules.push({
       test: /\.svg$/,
       use: ["@svgr/webpack"],

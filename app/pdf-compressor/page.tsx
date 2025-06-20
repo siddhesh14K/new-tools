@@ -1,149 +1,71 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState } from "react"
 import { ToolLayout } from "@/components/tool-layout"
-import { Button } from "@/components/ui/button"
+import { BatchProcessor } from "@/components/batch-processor"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Slider } from "@/components/ui/slider"
-import { FileText, Upload, Download, Trash2, Settings, Zap, Shield, Star } from "lucide-react"
-import { useDropzone } from "react-dropzone"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FileText, Settings, Zap, Shield, Star } from "lucide-react"
+import { FileUtils } from "@/lib/file-processing-simple"
+import { PDFProcessor, CompressionOptions } from "@/lib/pdf-processor"
 
-interface ProcessingStats {
-  originalSize: number
-  compressedSize: number
-  timeTaken: number
-  compressionMethod: string
-}
+type CompressionLevel = "light" | "balanced" | "aggressive"
 
 export default function PDFCompressorPage() {
-  const [file, setFile] = useState<File | null>(null)
-  const [compressing, setCompressing] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [compressedFile, setCompressedFile] = useState<Blob | null>(null)
-  const [compressionRatio, setCompressionRatio] = useState<number | null>(null)
-  const [compressionLevel, setCompressionLevel] = useState([70])
-  const [error, setError] = useState("")
-  const [processingStats, setProcessingStats] = useState<ProcessingStats | null>(null)
+  const [compressionLevel, setCompressionLevel] = useState<CompressionLevel>("balanced")
+  const [quality, setQuality] = useState([70])
+  const [removeMetadata, setRemoveMetadata] = useState(true)
+  const [optimizeImages, setOptimizeImages] = useState(true)
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0]
-    if (file && file.type === "application/pdf") {
-      setFile(file)
-      setError("")
-      setCompressedFile(null)
-      setCompressionRatio(null)
-      setProcessingStats(null)
-    } else {
-      setError("Please select a valid PDF file (max 100MB)")
-    }
-  }, [])
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      "application/pdf": [".pdf"],
-    },
-    multiple: false,
-    maxSize: 100 * 1024 * 1024, // 100MB
-  })
-
-  const compressPDF = async () => {
-    if (!file) return
-
-    setCompressing(true)
-    setProgress(0)
-    setError("")
-    const startTime = Date.now()
-
+  const processPDF = async (file: File, onProgress?: (progress: number) => void): Promise<Blob> => {
     try {
-      // Advanced PDF compression simulation with real file processing
-      const arrayBuffer = await file.arrayBuffer()
-      const originalSize = file.size
-
-      // Progressive compression with realistic timing
-      const progressSteps = [
-        { progress: 10, message: "Analyzing PDF structure..." },
-        { progress: 25, message: "Optimizing images..." },
-        { progress: 45, message: "Compressing text and fonts..." },
-        { progress: 65, message: "Removing metadata..." },
-        { progress: 80, message: "Applying compression algorithms..." },
-        { progress: 95, message: "Finalizing compressed PDF..." },
-      ]
-
-      for (const step of progressSteps) {
-        await new Promise((resolve) => setTimeout(resolve, 400))
-        setProgress(step.progress)
+      // Validate file type
+      if (!file.type.includes('pdf') && !file.name.toLowerCase().endsWith('.pdf')) {
+        throw new Error("Please select a valid PDF file")
       }
 
-      // Calculate compression based on user setting and file characteristics
-      const baseCompression = compressionLevel[0] / 100
-      const fileTypeMultiplier = originalSize > 10 * 1024 * 1024 ? 1.2 : 1.0 // Better compression for larger files
-      const actualCompressionRatio = Math.min(0.9, baseCompression * fileTypeMultiplier)
+      // Prepare compression options
+      const options: CompressionOptions = {
+        quality: quality[0],
+        level: compressionLevel,
+        removeMetadata,
+        optimizeImages
+      }
 
-      // Create compressed file with realistic size reduction
-      const compressedSize = Math.floor(originalSize * (1 - actualCompressionRatio))
-      const compressedArrayBuffer = arrayBuffer.slice(0, Math.max(compressedSize, originalSize * 0.1))
-
-      // Add PDF header to maintain file integrity
-      const pdfHeader = new Uint8Array([0x25, 0x50, 0x44, 0x46]) // %PDF
-      const compressedData = new Uint8Array(compressedArrayBuffer.byteLength + pdfHeader.length)
-      compressedData.set(pdfHeader)
-      compressedData.set(new Uint8Array(compressedArrayBuffer), pdfHeader.length)
-
-      const compressedBlob = new Blob([compressedData], { type: "application/pdf" })
-      const endTime = Date.now()
-
-      setCompressedFile(compressedBlob)
-      setCompressionRatio(actualCompressionRatio * 100)
-      setProcessingStats({
-        originalSize,
-        compressedSize: compressedBlob.size,
-        timeTaken: endTime - startTime,
-        compressionMethod: compressionLevel[0] > 80 ? "Maximum" : compressionLevel[0] > 50 ? "High" : "Balanced",
-      })
-      setProgress(100)
-    } catch (err) {
-      setError("Failed to compress PDF. Please try again with a different file.")
-      console.error(err)
-    } finally {
-      setCompressing(false)
+      // Use the real PDF processor
+      const compressedBlob = await PDFProcessor.compressPDF(file, options, onProgress)
+      
+      return compressedBlob
+    } catch (error) {
+      console.error("PDF compression failed:", error)
+      throw new Error(error instanceof Error ? error.message : "Failed to compress PDF. Please ensure the file is a valid PDF.")
     }
   }
 
-  const downloadCompressed = () => {
-    if (!compressedFile) return
-
-    const url = URL.createObjectURL(compressedFile)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `compressed_${file?.name || "document.pdf"}`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+  const getOutputFileName = (originalName: string): string => {
+    const nameWithoutExt = originalName.replace(/\.pdf$/i, "")
+    return `compressed_${nameWithoutExt}.pdf`
   }
 
-  const reset = () => {
-    setFile(null)
-    setCompressedFile(null)
-    setCompressionRatio(null)
-    setProgress(0)
-    setError("")
-    setProcessingStats(null)
+  const getCompressionDescription = (level: CompressionLevel) => {
+    switch (level) {
+      case "light":
+        return "Minimal compression, preserves highest quality"
+      case "balanced":
+        return "Good balance between file size and quality"
+      case "aggressive":
+        return "Maximum compression, smaller file size"
+    }
   }
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-  }
-
-  const formatTime = (ms: number) => {
-    return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`
+  const getExpectedReduction = (level: CompressionLevel, qualityValue: number) => {
+    const compressionRatio = PDFProcessor.getCompressionRatio(level)
+    const qualityFactor = qualityValue / 100
+    const finalRatio = compressionRatio * (0.5 + qualityFactor * 0.5)
+    const reduction = (1 - finalRatio) * 100
+    
+    return `${Math.round(reduction)}%`
   }
 
   return (
@@ -152,6 +74,50 @@ export default function PDFCompressorPage() {
       description="Compress PDF files online for free without losing quality. Advanced compression algorithms reduce PDF size by up to 90%. No registration required, completely secure."
       icon={<FileText className="h-8 w-8 text-red-500" />}
       keywords="PDF compressor online free, compress PDF without losing quality, reduce PDF size, PDF file compressor, online PDF compression tool"
+      toolCategory="pdf-tools"
+      howToSteps={[
+        {
+          name: "Upload PDF Files",
+          text: "Select or drag and drop your PDF files (up to 50MB each)"
+        },
+        {
+          name: "Choose Compression Level",
+          text: "Select compression quality: Light, Balanced, or Aggressive"
+        },
+        {
+          name: "Compress PDFs",
+          text: "Click 'Process All Files' to reduce your file sizes"
+        },
+        {
+          name: "Download Results",
+          text: "Download individual compressed PDFs or all as a ZIP file"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How much can I compress my PDF?",
+          answer: "Compression results vary by content, but you can typically reduce PDF size by 30-90% while maintaining good quality."
+        },
+        {
+          question: "Will compression affect PDF quality?",
+          answer: "Our smart compression algorithms maintain visual quality while reducing file size. You can choose different quality levels based on your needs."
+        },
+        {
+          question: "What's the maximum file size I can upload?",
+          answer: "You can compress PDF files up to 50MB in size. This covers most documents, presentations, and reports."
+        },
+        {
+          question: "Is my PDF secure during compression?",
+          answer: "Yes, all PDF processing happens locally in your browser. Your files are never uploaded to our servers."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "PDF Tools", path: "/pdf-tools" },
+        { label: "PDF Compressor", path: "/pdf-compressor" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT2M"
     >
       <div className="space-y-6">
         {/* Trust Indicators */}
@@ -163,7 +129,7 @@ export default function PDFCompressorPage() {
             </div>
             <div className="flex items-center text-blue-700">
               <Zap className="h-4 w-4 mr-1" />
-              <span>Lightning Fast</span>
+              <span>Batch Processing</span>
             </div>
             <div className="flex items-center text-purple-700">
               <Star className="h-4 w-4 mr-1" />
@@ -172,249 +138,131 @@ export default function PDFCompressorPage() {
           </div>
         </div>
 
-        {/* Upload Area */}
-        {!file && (
-          <Card className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors">
-            <CardContent className="p-8">
-              <div
-                {...getRootProps()}
-                className={`text-center cursor-pointer transition-all duration-200 ${isDragActive ? "scale-105" : ""}`}
-              >
-                <input {...getInputProps()} />
-                <div className="mb-4">
-                  <Upload className="h-16 w-16 mx-auto text-primary/60 mb-4" />
-                </div>
-                <h3 className="text-2xl font-semibold mb-2">
-                  {isDragActive ? "Drop your PDF here" : "Choose PDF file or drag & drop"}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  Maximum file size: 100MB • Supports all PDF versions • 100% secure processing
-                </p>
-                <Button size="lg" className="bg-gradient-to-r from-primary to-purple-600">
-                  📁 Select PDF File
-                </Button>
-
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center justify-center">
-                    <Shield className="h-4 w-4 mr-2 text-green-500" />
-                    Files processed locally
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Zap className="h-4 w-4 mr-2 text-blue-500" />
-                    Instant compression
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Download className="h-4 w-4 mr-2 text-purple-500" />
-                    No watermarks
-                  </div>
-                </div>
+        {/* Batch Processor */}
+        <BatchProcessor
+          title="Choose PDF files to compress"
+          description="Maximum file size: 50MB • Supports all PDF versions • Batch processing up to 10 files • 100% secure processing"
+          acceptedFileTypes={{
+            "application/pdf": [".pdf"]
+          }}
+          maxFileSize={50 * 1024 * 1024} // 50MB
+          maxFiles={10}
+          processFile={processPDF}
+          getOutputFileName={getOutputFileName}
+        >
+          {/* Compression Settings */}
+          <div className="space-y-6">
+            {/* Compression Level */}
+            <div>
+              <label className="text-sm font-medium mb-3 block">Compression Level</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {[
+                  { value: "light" as CompressionLevel, label: "Light", description: "High quality, minimal compression" },
+                  { value: "balanced" as CompressionLevel, label: "Balanced", description: "Good balance of size and quality" },
+                  { value: "aggressive" as CompressionLevel, label: "Aggressive", description: "Maximum compression" }
+                ].map((level) => (
+                  <Card 
+                    key={level.value}
+                    className={`cursor-pointer transition-all ${
+                      compressionLevel === level.value 
+                        ? "border-primary bg-primary/5" 
+                        : "border-muted hover:border-primary/50"
+                    }`}
+                    onClick={() => setCompressionLevel(level.value)}
+                  >
+                    <CardContent className="p-4 text-center">
+                      <h4 className="font-semibold mb-1">{level.label}</h4>
+                      <p className="text-xs text-muted-foreground">{level.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
 
-        {/* File Info & Settings */}
-        {file && !compressedFile && (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  📄 File Information
-                  <Button variant="outline" size="icon" onClick={reset}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">File Name</p>
-                    <p className="font-medium truncate">{file.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">File Size</p>
-                    <p className="font-medium">{formatFileSize(file.size)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">File Type</p>
-                    <p className="font-medium">PDF Document</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Quality Slider */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium">Quality</label>
+                <span className="text-sm text-muted-foreground">
+                  {quality[0]}% - {quality[0] >= 80 ? "High" : quality[0] >= 60 ? "Medium" : "Low"}
+                </span>
+              </div>
+              <Slider 
+                value={quality} 
+                onValueChange={setQuality} 
+                max={95} 
+                min={20} 
+                step={5} 
+                className="w-full" 
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>Smaller file</span>
+                <span>Better quality</span>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Settings className="h-5 w-5 mr-2" />
-                  Compression Settings
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium">Compression Level</label>
-                    <span className="text-sm text-muted-foreground">
-                      {compressionLevel[0]}% -{" "}
-                      {compressionLevel[0] > 80
-                        ? "Maximum"
-                        : compressionLevel[0] > 50
-                          ? "High"
-                          : compressionLevel[0] > 30
-                            ? "Balanced"
-                            : "Light"}
-                    </span>
+            {/* Advanced Options */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Remove Metadata</h4>
+                    <p className="text-xs text-muted-foreground">Remove author, creation date, etc.</p>
                   </div>
-                  <Slider
-                    value={compressionLevel}
-                    onValueChange={setCompressionLevel}
-                    max={90}
-                    min={10}
-                    step={10}
-                    className="w-full"
+                  <input
+                    type="checkbox"
+                    checked={removeMetadata}
+                    onChange={(e) => setRemoveMetadata(e.target.checked)}
+                    className="rounded"
                   />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                    <span>Light (Faster)</span>
-                    <span>Maximum (Smaller)</span>
-                  </div>
                 </div>
+              </Card>
 
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <h4 className="font-medium mb-2">Expected Results:</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Estimated size reduction:</span>
-                      <div className="font-medium text-green-600">
-                        {compressionLevel[0] > 80
-                          ? "70-90%"
-                          : compressionLevel[0] > 50
-                            ? "50-70%"
-                            : compressionLevel[0] > 30
-                              ? "30-50%"
-                              : "10-30%"}
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Processing time:</span>
-                      <div className="font-medium text-blue-600">
-                        {compressionLevel[0] > 80
-                          ? "3-5 seconds"
-                          : compressionLevel[0] > 50
-                            ? "2-3 seconds"
-                            : "1-2 seconds"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Button onClick={compressPDF} disabled={compressing} className="w-full" size="lg">
-                  {compressing ? "🔄 Compressing PDF..." : "🚀 Compress PDF Now"}
-                </Button>
-              </CardContent>
-            </Card>
-          </>
-        )}
-
-        {/* Progress */}
-        {compressing && (
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="font-medium">Compressing your PDF...</span>
-                  <span className="text-primary font-medium">{progress}%</span>
-                </div>
-                <Progress value={progress} className="h-3" />
-                <div className="text-center text-sm text-muted-foreground">
-                  {progress < 25
-                    ? "🔍 Analyzing PDF structure..."
-                    : progress < 50
-                      ? "🖼️ Optimizing images and graphics..."
-                      : progress < 75
-                        ? "📝 Compressing text and fonts..."
-                        : progress < 95
-                          ? "⚡ Applying final optimizations..."
-                          : "✅ Almost done!"}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Results */}
-        {compressedFile && compressionRatio && processingStats && (
-          <Card className="border-green-200 bg-green-50/50">
-            <CardHeader>
-              <CardTitle className="text-green-700 flex items-center">✅ Compression Complete!</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Main Results */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-white rounded-lg border">
-                  <div className="text-2xl font-bold text-green-600 mb-1">{compressionRatio.toFixed(1)}%</div>
-                  <div className="text-sm text-muted-foreground">Size Reduced</div>
-                </div>
-                <div className="text-center p-4 bg-white rounded-lg border">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">
-                    {formatFileSize(processingStats.compressedSize)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">New File Size</div>
-                </div>
-                <div className="text-center p-4 bg-white rounded-lg border">
-                  <div className="text-2xl font-bold text-purple-600 mb-1">{formatTime(processingStats.timeTaken)}</div>
-                  <div className="text-sm text-muted-foreground">Processing Time</div>
-                </div>
-              </div>
-
-              {/* Detailed Stats */}
-              <div className="bg-white rounded-lg p-4 border">
-                <h4 className="font-semibold mb-3">📊 Compression Details</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <Card className="p-4">
+                <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-muted-foreground">Original size:</span>
-                    <div className="font-medium">{formatFileSize(processingStats.originalSize)}</div>
+                    <h4 className="font-medium">Optimize Images</h4>
+                    <p className="text-xs text-muted-foreground">Compress embedded images</p>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Compressed size:</span>
-                    <div className="font-medium">{formatFileSize(processingStats.compressedSize)}</div>
+                  <input
+                    type="checkbox"
+                    checked={optimizeImages}
+                    onChange={(e) => setOptimizeImages(e.target.checked)}
+                    className="rounded"
+                  />
+                </div>
+              </Card>
+            </div>
+
+            {/* Compression Preview */}
+            <div className="bg-muted/50 rounded-lg p-4">
+              <h4 className="font-medium mb-2">📊 Compression Preview:</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Expected reduction:</span>
+                  <div className="font-medium text-green-600">
+                    {getExpectedReduction(compressionLevel, quality[0])}
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Compression method:</span>
-                    <div className="font-medium">{processingStats.compressionMethod}</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Compression level:</span>
+                  <div className="font-medium text-blue-600 capitalize">
+                    {compressionLevel}
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Space saved:</span>
-                    <div className="font-medium text-green-600">
-                      {formatFileSize(processingStats.originalSize - processingStats.compressedSize)}
-                    </div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Processing time:</span>
+                  <div className="font-medium text-purple-600">
+                    {compressionLevel === "aggressive" ? "3-5 sec" : compressionLevel === "balanced" ? "2-3 sec" : "1-2 sec"}
                   </div>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={downloadCompressed}
-                  size="lg"
-                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700"
-                >
-                  <Download className="h-5 w-5 mr-2" />
-                  Download Compressed PDF
-                </Button>
-                <Button variant="outline" onClick={reset} size="lg" className="flex-1">
-                  🔄 Compress Another PDF
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Error */}
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+              <p className="text-xs text-muted-foreground mt-2">
+                {getCompressionDescription(compressionLevel)}
+              </p>
+            </div>
+          </div>
+        </BatchProcessor>
 
         {/* SEO Content */}
         <div className="prose max-w-none mt-12 bg-muted/30 rounded-2xl p-8">
@@ -430,6 +278,9 @@ export default function PDFCompressorPage() {
               <strong>Advanced Compression:</strong> Up to 90% size reduction with smart algorithms
             </li>
             <li>
+              <strong>Batch Processing:</strong> Compress multiple PDFs simultaneously
+            </li>
+            <li>
               <strong>Quality Preservation:</strong> Maintains text clarity and image quality
             </li>
             <li>
@@ -443,9 +294,6 @@ export default function PDFCompressorPage() {
             </li>
             <li>
               <strong>All Devices:</strong> Works on desktop, tablet, and mobile
-            </li>
-            <li>
-              <strong>No Registration:</strong> Start compressing immediately
             </li>
             <li>
               <strong>Professional Results:</strong> Enterprise-grade compression technology
@@ -479,7 +327,7 @@ export default function PDFCompressorPage() {
           <h3>🔧 How Our PDF Compression Works</h3>
           <ol>
             <li>
-              <strong>Upload:</strong> Select your PDF file (up to 100MB)
+              <strong>Upload:</strong> Select your PDF files (up to 50MB each)
             </li>
             <li>
               <strong>Analyze:</strong> Our AI analyzes the document structure
@@ -491,24 +339,38 @@ export default function PDFCompressorPage() {
               <strong>Process:</strong> Advanced algorithms reduce file size
             </li>
             <li>
-              <strong>Download:</strong> Get your compressed PDF instantly
+              <strong>Download:</strong> Get your compressed PDFs instantly
             </li>
           </ol>
 
           <h3>💡 Pro Tips for Better Compression</h3>
           <ul>
-            <li>Use "Maximum" compression for documents with many images</li>
+            <li>Use "Aggressive" compression for documents with many images</li>
             <li>Choose "Balanced" for text-heavy documents</li>
             <li>Large files (greater than 10MB) typically compress better</li>
             <li>Scanned documents can be reduced by 80-90%</li>
             <li>Already optimized PDFs may have limited compression</li>
+            <li>Use batch processing to save time with multiple files</li>
           </ul>
 
-          <h3>🌟 Customer Reviews</h3>
-          <blockquote className="border-l-4 border-primary pl-4 italic">
-            "This PDF compressor saved me hours of work! Reduced my 50MB presentation to just 8MB without any quality
-            loss. Absolutely amazing!" - Sarah K., Marketing Manager
-          </blockquote>
+          <h3>🚀 New Features in 2024</h3>
+          <ul>
+            <li>
+              <strong>Batch Processing:</strong> Process up to 10 PDFs at once
+            </li>
+            <li>
+              <strong>Smart Compression:</strong> AI-powered optimization
+            </li>
+            <li>
+              <strong>Metadata Removal:</strong> Remove sensitive information
+            </li>
+            <li>
+              <strong>Progress Tracking:</strong> Real-time compression progress
+            </li>
+            <li>
+              <strong>ZIP Downloads:</strong> Download all compressed PDFs as ZIP
+            </li>
+          </ul>
         </div>
       </div>
     </ToolLayout>

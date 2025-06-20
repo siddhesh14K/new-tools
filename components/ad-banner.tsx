@@ -13,7 +13,7 @@ export function AdBanner({ slot, format = "auto", responsive = true }: AdBannerP
 
   useEffect(() => {
     // Only show ads in production with proper AdSense setup
-    setIsProduction(process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_ADSENSE_ID)
+    setIsProduction(process.env.NODE_ENV === "production" && !!process.env.NEXT_PUBLIC_ADSENSE_ID)
   }, [])
 
   // Don't render ads in development or without proper setup

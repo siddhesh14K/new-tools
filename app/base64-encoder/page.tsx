@@ -91,19 +91,55 @@ export default function Base64EncoderPage() {
     reader.readAsText(file)
   }
 
-  const howToUse = [
-    "Enter your text or upload a file",
-    "Choose to encode (text to Base64) or decode (Base64 to text)",
-    "Click the process button to convert",
-    "Copy the result or download as a file",
-  ]
-
   return (
     <ToolLayout
-      title="Base64 Encoder"
-      description="Encode and decode Base64 strings securely"
+      title="Base64 Encoder - Encode & Decode Base64 Online Free"
+      description="Encode and decode Base64 strings securely online. Perfect for developers, data transmission, and web development. No registration required."
       icon={<Code className="h-8 w-8 text-red-500" />}
-      howToUse={howToUse}
+      toolCategory="text-tools"
+      howToSteps={[
+        {
+          name: "Enter Text or Upload File",
+          text: "Type your text directly or upload a text file to encode/decode"
+        },
+        {
+          name: "Choose Mode",
+          text: "Select 'Encode' to convert text to Base64 or 'Decode' to convert Base64 to text"
+        },
+        {
+          name: "Process Data",
+          text: "Click the process button to convert your data"
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy the result to clipboard or download as a text file"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What is Base64 encoding?",
+          answer: "Base64 is a binary-to-text encoding scheme that represents binary data in ASCII format using 64 characters."
+        },
+        {
+          question: "When should I use Base64?",
+          answer: "Base64 is commonly used for email attachments, data URLs in web development, API data transmission, and configuration files."
+        },
+        {
+          question: "Is Base64 encoding secure?",
+          answer: "Base64 is not encryption - it's just encoding. Anyone can decode Base64 data, so don't use it for sensitive information."
+        },
+        {
+          question: "What file types can I upload?",
+          answer: "You can upload text files (.txt) to encode or decode their contents."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Text Tools", path: "/text-tools" },
+        { label: "Base64 Encoder", path: "/base64-encoder" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-4">
         {/* Mode Selection */}

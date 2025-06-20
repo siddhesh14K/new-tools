@@ -71,13 +71,6 @@ export default function DateCalculatorPage() {
     }
   }
 
-  const howToUse = [
-    "Select or enter your start date",
-    "Select or enter your end date",
-    'Click "Calculate" to see the difference',
-    "View results in days, weeks, months, and years",
-  ]
-
   // Add download function
   const downloadResult = () => {
     if (!result) return
@@ -117,10 +110,53 @@ export default function DateCalculatorPage() {
 
   return (
     <ToolLayout
-      title="Date Calculator"
-      description="Calculate the exact difference between two dates"
+      title="Date Calculator - Calculate Date Difference Online Free"
+      description="Calculate the exact difference between two dates in days, weeks, months, and years. Perfect for project planning and age calculations."
       icon={<Calendar className="h-8 w-8 text-purple-500" />}
-      howToUse={howToUse}
+      toolCategory="utility-tools"
+      howToSteps={[
+        {
+          name: "Select Start Date",
+          text: "Choose or enter your start date using the date picker"
+        },
+        {
+          name: "Select End Date", 
+          text: "Choose or enter your end date using the date picker"
+        },
+        {
+          name: "Calculate Difference",
+          text: "Click 'Calculate Difference' to see the time between dates"
+        },
+        {
+          name: "View Results",
+          text: "See results in days, weeks, months, years, hours, and minutes"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How accurate are the calculations?",
+          answer: "Our calculations are precise to the day. Months are calculated using an average of 30.44 days, and years account for leap years (365.25 days average)."
+        },
+        {
+          question: "Can I calculate past dates?",
+          answer: "Yes, you can calculate the difference between any two dates, whether they're in the past, present, or future."
+        },
+        {
+          question: "What if I enter the dates in wrong order?",
+          answer: "The tool will show an error if the start date is after the end date. Simply swap the dates to get the correct calculation."
+        },
+        {
+          question: "Can I download the results?",
+          answer: "Yes, you can download a detailed breakdown of the calculation results as a text file for your records."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Utility Tools", path: "/utility-tools" },
+        { label: "Date Calculator", path: "/date-calculator" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-4">
         {/* Date Inputs */}

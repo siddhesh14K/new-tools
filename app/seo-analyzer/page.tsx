@@ -195,6 +195,50 @@ export default function SEOAnalyzerPage() {
       title="SEO Analyzer - Free Website SEO Analysis Tool"
       description="Analyze your website's SEO performance for free. Check meta tags, content structure, page speed, mobile optimization, and get actionable recommendations to improve search rankings."
       icon={<Search className="h-8 w-8 text-green-400" />}
+      toolCategory="seo-tools"
+      howToSteps={[
+        {
+          name: "Enter Website URL",
+          text: "Input the URL of the website you want to analyze"
+        },
+        {
+          name: "Start Analysis",
+          text: "Click 'Analyze Website' to begin the SEO audit"
+        },
+        {
+          name: "Review Results",
+          text: "Examine the detailed SEO analysis and scores"
+        },
+        {
+          name: "Implement Recommendations",
+          text: "Follow the actionable suggestions to improve your SEO"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What does the SEO analyzer check?",
+          answer: "Our tool analyzes meta tags, headings, content structure, page speed, mobile optimization, images, links, and other important SEO factors."
+        },
+        {
+          question: "How accurate is the SEO analysis?",
+          answer: "Our analyzer uses industry-standard SEO best practices and provides accurate assessments based on current search engine guidelines."
+        },
+        {
+          question: "Can I analyze any website?",
+          answer: "Yes, you can analyze any publicly accessible website. Just enter the URL and our tool will fetch and analyze the page."
+        },
+        {
+          question: "How often should I run SEO analysis?",
+          answer: "We recommend running SEO analysis monthly or after making significant changes to your website to track improvements."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "SEO Tools", path: "/seo-tools" },
+        { label: "SEO Analyzer", path: "/seo-analyzer" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT3M"
     >
       <div className="space-y-6">
         {/* URL Input */}

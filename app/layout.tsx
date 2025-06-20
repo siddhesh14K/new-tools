@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Analytics } from "@/components/analytics"
-import { JsonLdSchema } from "@/components/json-ld-schema"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
@@ -91,7 +90,6 @@ export default function RootLayout({
           </Suspense>
           <Footer />
           <Analytics />
-          <JsonLdSchema />
         </ThemeProvider>
       </body>
     </html>

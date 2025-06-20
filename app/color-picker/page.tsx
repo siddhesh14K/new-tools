@@ -173,9 +173,53 @@ export default function ColorPickerPage() {
 
   return (
     <ToolLayout
-      title="Color Picker & Palette Generator"
+      title="Color Picker & Palette Generator - Free Online Color Tool"
       description="Pick colors, generate palettes, and get color codes in HEX, RGB, HSL, HSV, and CMYK formats. Perfect for designers and developers."
       icon={<Palette className="h-8 w-8 text-pink-500" />}
+      toolCategory="design-tools"
+      howToSteps={[
+        {
+          name: "Pick a Color",
+          text: "Use the color picker or enter a color value to select your base color"
+        },
+        {
+          name: "View Color Formats",
+          text: "See the color in different formats: HEX, RGB, HSL, HSV, and CMYK"
+        },
+        {
+          name: "Generate Palette",
+          text: "Click 'Generate Palette' to create complementary colors and harmonious schemes"
+        },
+        {
+          name: "Copy Color Codes",
+          text: "Click any color format to copy it to your clipboard for use in your projects"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What color formats are supported?",
+          answer: "We support HEX, RGB, HSL, HSV, and CMYK color formats. Each format is useful for different applications."
+        },
+        {
+          question: "What is the difference between RGB and HSL?",
+          answer: "RGB uses Red, Green, Blue values (0-255), while HSL uses Hue, Saturation, Lightness which is more intuitive for color adjustments."
+        },
+        {
+          question: "How does palette generation work?",
+          answer: "Our palette generator creates harmonious color schemes using color theory principles like complementary, triadic, and analogous colors."
+        },
+        {
+          question: "Can I use these colors for print?",
+          answer: "For print projects, use the CMYK values as they're designed for print color reproduction. RGB and HEX are better for digital/web use."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Design Tools", path: "/design-tools" },
+        { label: "Color Picker", path: "/color-picker" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT2M"
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Color Picker Section */}

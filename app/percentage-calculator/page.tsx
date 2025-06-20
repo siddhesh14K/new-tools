@@ -68,10 +68,11 @@ export default function PercentageCalculatorPage() {
   const updateCalculation = (type: string, field: string, value: string) => {
     setCalculations((prev) => {
       const updated = { ...prev }
+      const currentCalc = updated[type as keyof typeof calculations] as any
       updated[type as keyof typeof calculations] = {
-        ...updated[type as keyof typeof calculations],
+        ...currentCalc,
         [field]: value,
-      }
+      } as any
 
       // Recalculate based on type
       switch (type) {
@@ -138,9 +139,53 @@ export default function PercentageCalculatorPage() {
 
   return (
     <ToolLayout
-      title="Percentage Calculator"
-      description="Calculate percentages, percentage increase/decrease, discounts, tips, and more. Fast and accurate percentage calculations."
+      title="Percentage Calculator - Calculate Percentages Online Free"
+      description="Calculate percentages, percentage increase/decrease, discounts, tips, and more. Fast and accurate percentage calculations for all your needs."
       icon={<Calculator className="h-8 w-8 text-rose-500" />}
+      toolCategory="utility-tools"
+      howToSteps={[
+        {
+          name: "Choose Calculation Type",
+          text: "Select the type of percentage calculation you need"
+        },
+        {
+          name: "Enter Values",
+          text: "Input the numbers for your calculation"
+        },
+        {
+          name: "View Results",
+          text: "Results are calculated automatically as you type"
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy individual results or download all calculations"
+        }
+      ]}
+      faqs={[
+        {
+          question: "How do I calculate what percentage one number is of another?",
+          answer: "Use the 'X is what percent of Y?' calculator. Enter the part (X) and the whole (Y), and the result will show the percentage."
+        },
+        {
+          question: "How do I calculate percentage increase or decrease?",
+          answer: "Use the 'Percentage Increase/Decrease' calculator. Enter the original value and new value to see the percentage change."
+        },
+        {
+          question: "How do I add or subtract a percentage from a number?",
+          answer: "Use the 'Add X% to Y' or 'Subtract X% from Y' calculators. These are useful for calculating tips, discounts, or tax."
+        },
+        {
+          question: "Can I download my calculation results?",
+          answer: "Yes, you can download all your percentage calculations as a text file for your records."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Utility Tools", path: "/utility-tools" },
+        { label: "Percentage Calculator", path: "/percentage-calculator" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT2M"
     >
       <div className="space-y-6">
         {/* What is X% of Y? */}

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Upload, Download, Trash2, Scissors, FileDown } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { PDFProcessor } from "@/lib/pdf-processor"
 
 interface SplitPage {
   pageNumber: number
@@ -61,21 +62,25 @@ export default function PDFSplitterPage() {
     setError("")
 
     try {
-      // Read the PDF file
-      const arrayBuffer = await file.arrayBuffer()
-      const pdfData = new Uint8Array(arrayBuffer)
+      // Use the real PDF processor to split the PDF
+      const splitBlobs = await PDFProcessor.splitPDF(file, (progress) => {
+        setProgress(progress)
+      })
 
-      setProgress(20)
+      // Convert blobs to SplitPage format
+      const splitResults: SplitPage[] = splitBlobs.map((blob, index) => ({
+        pageNumber: index + 1,
+        blob,
+        size: blob.size,
+      }))
 
-      // Simulate PDF parsing and page extraction
-      let pagesToExtract: number[] = []
+      // Filter based on split mode
+      let filteredResults = splitResults
 
-      if (splitMode === "all-pages") {
-        pagesToExtract = Array.from({ length: totalPages }, (_, i) => i + 1)
-      } else if (splitMode === "page-range") {
+      if (splitMode === "page-range") {
         const start = Number.parseInt(pageRange.start) || 1
-        const end = Number.parseInt(pageRange.end) || totalPages
-        pagesToExtract = Array.from({ length: end - start + 1 }, (_, i) => start + i)
+        const end = Number.parseInt(pageRange.end) || splitResults.length
+        filteredResults = splitResults.slice(start - 1, end)
       } else if (splitMode === "custom-pages") {
         // Parse custom pages like "1,3,5-7,10"
         const pages = customPages
@@ -88,50 +93,16 @@ export default function PDFSplitterPage() {
             }
             return [Number.parseInt(trimmed)]
           })
-          .filter((p) => p >= 1 && p <= totalPages)
-        pagesToExtract = [...new Set(pages)].sort((a, b) => a - b)
+          .filter((p) => p >= 1 && p <= splitResults.length)
+        
+        const uniquePages = [...new Set(pages)].sort((a, b) => a - b)
+        filteredResults = uniquePages.map(pageNum => splitResults[pageNum - 1]).filter(Boolean)
       }
 
-      setProgress(40)
-
-      // Create individual PDF pages (simulation)
-      const splitResults: SplitPage[] = []
-      const basePageSize = Math.floor(pdfData.length / totalPages)
-
-      for (let i = 0; i < pagesToExtract.length; i++) {
-        const pageNum = pagesToExtract[i]
-
-        // Simulate page extraction with realistic timing
-        await new Promise((resolve) => setTimeout(resolve, 200))
-
-        // Create a simulated page PDF
-        const pageStart = (pageNum - 1) * basePageSize
-        const pageEnd = Math.min(pageStart + basePageSize + 1000, pdfData.length) // Add some overlap
-
-        // Create PDF header for individual page
-        const pdfHeader = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34]) // %PDF-1.4
-        const pageData = pdfData.slice(pageStart, pageEnd)
-
-        // Combine header with page data
-        const fullPageData = new Uint8Array(pdfHeader.length + pageData.length)
-        fullPageData.set(pdfHeader)
-        fullPageData.set(pageData, pdfHeader.length)
-
-        const pageBlob = new Blob([fullPageData], { type: "application/pdf" })
-
-        splitResults.push({
-          pageNumber: pageNum,
-          blob: pageBlob,
-          size: pageBlob.size,
-        })
-
-        setProgress(40 + (i / pagesToExtract.length) * 50)
-      }
-
-      setSplitPages(splitResults)
-      setProgress(100)
+      setSplitPages(filteredResults)
+      setTotalPages(splitResults.length)
     } catch (err) {
-      setError("Failed to split PDF. Please try again with a different file.")
+      setError(err instanceof Error ? err.message : "Failed to split PDF. Please try again with a different file.")
       console.error(err)
     } finally {
       setSplitting(false)
@@ -139,14 +110,8 @@ export default function PDFSplitterPage() {
   }
 
   const downloadPage = (page: SplitPage) => {
-    const url = URL.createObjectURL(page.blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `${file?.name.replace(".pdf", "")}_page_${page.pageNumber}.pdf`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    const filename = `${file?.name.replace(".pdf", "")}_page_${page.pageNumber}.pdf`
+    PDFProcessor.downloadBlob(page.blob, filename)
   }
 
   const downloadAll = () => {
@@ -164,11 +129,7 @@ export default function PDFSplitterPage() {
   }
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+    return PDFProcessor.formatFileSize(bytes)
   }
 
   return (
@@ -176,6 +137,50 @@ export default function PDFSplitterPage() {
       title="PDF Splitter - Split PDF Pages Online Free"
       description="Split PDF files into individual pages or extract specific page ranges online for free. No registration required, works on all devices."
       icon={<Scissors className="h-8 w-8 text-red-700" />}
+      toolCategory="pdf-tools"
+      howToSteps={[
+        {
+          name: "Upload PDF File",
+          text: "Select or drag and drop your PDF file (up to 25MB)"
+        },
+        {
+          name: "Choose Split Method",
+          text: "Select to split all pages or extract specific page ranges"
+        },
+        {
+          name: "Split PDF",
+          text: "Click 'Split PDF' to separate your document into individual pages"
+        },
+        {
+          name: "Download Pages",
+          text: "Download individual pages or all pages as a ZIP file"
+        }
+      ]}
+      faqs={[
+        {
+          question: "Can I split large PDF files?",
+          answer: "Yes, you can split PDF files up to 25MB in size. This covers most documents, reports, and presentations."
+        },
+        {
+          question: "Can I extract specific pages instead of splitting all?",
+          answer: "Yes, you can choose to extract specific page ranges or split the entire document into individual pages."
+        },
+        {
+          question: "What format will the split pages be in?",
+          answer: "Each split page will be saved as a separate PDF file, maintaining the original quality and formatting."
+        },
+        {
+          question: "Is my PDF secure during the splitting process?",
+          answer: "Yes, all PDF processing happens locally in your browser. Your files are never uploaded to our servers."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "PDF Tools", path: "/pdf-tools" },
+        { label: "PDF Splitter", path: "/pdf-splitter" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT2M"
     >
       <div className="space-y-6">
         {/* Upload Area */}

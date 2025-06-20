@@ -91,8 +91,10 @@ export default function UnitConverterPage() {
       setResult(converted.toFixed(4).replace(/\.?0+$/, ""))
     } else {
       // Standard unit conversions
-      const fromFactor = categoryData.units[fromUnit as keyof typeof categoryData.units].factor
-      const toFactor = categoryData.units[toUnit as keyof typeof categoryData.units].factor
+      const fromUnitData = categoryData.units[fromUnit as keyof typeof categoryData.units] as any
+      const toUnitData = categoryData.units[toUnit as keyof typeof categoryData.units] as any
+      const fromFactor = fromUnitData?.factor || 1
+      const toFactor = toUnitData?.factor || 1
       const converted = (num / fromFactor) * toFactor
       setResult(converted.toFixed(6).replace(/\.?0+$/, ""))
     }
@@ -122,21 +124,16 @@ export default function UnitConverterPage() {
     setResult("")
   }
 
-  const howToUse = [
-    "Select the type of unit you want to convert",
-    "Choose your source and target units",
-    "Enter the value you want to convert",
-    "See the result instantly as you type",
-  ]
-
   const currentCategory = conversions[category as keyof typeof conversions]
 
   const downloadResult = () => {
     if (!inputValue || !result) return
 
     const categoryData = conversions[category as keyof typeof conversions]
-    const fromUnitName = categoryData.units[fromUnit as keyof typeof categoryData.units].name
-    const toUnitName = categoryData.units[toUnit as keyof typeof categoryData.units].name
+    const fromUnitData = categoryData.units[fromUnit as keyof typeof categoryData.units] as any
+    const toUnitData = categoryData.units[toUnit as keyof typeof categoryData.units] as any
+    const fromUnitName = fromUnitData?.name || fromUnit
+    const toUnitName = toUnitData?.name || toUnit
 
     const content = [
       "UNIT CONVERSION RESULT",
@@ -163,10 +160,53 @@ export default function UnitConverterPage() {
 
   return (
     <ToolLayout
-      title="Unit Converter"
-      description="Convert between different units instantly"
+      title="Unit Converter - Convert Units Online Free"
+      description="Convert between different units instantly. Weight, length, temperature, volume conversions with accurate results."
       icon={<Scale className="h-8 w-8 text-orange-500" />}
-      howToUse={howToUse}
+      toolCategory="utility-tools"
+      howToSteps={[
+        {
+          name: "Select Conversion Type",
+          text: "Choose the type of unit you want to convert (weight, length, temperature, volume)"
+        },
+        {
+          name: "Choose Units",
+          text: "Select your source and target units from the dropdown menus"
+        },
+        {
+          name: "Enter Value",
+          text: "Input the value you want to convert"
+        },
+        {
+          name: "View Results",
+          text: "See the converted result instantly as you type"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What types of units can I convert?",
+          answer: "You can convert weight (kg, lb, g, oz), length (m, ft, cm, in, km, mi), temperature (°C, °F, K), and volume (L, gal, mL, cups) units."
+        },
+        {
+          question: "How accurate are the conversions?",
+          answer: "Our conversions use precise conversion factors and are accurate to 6 decimal places for most units."
+        },
+        {
+          question: "Can I swap the from and to units quickly?",
+          answer: "Yes, use the swap button (↕) between the unit selectors to quickly reverse the conversion direction."
+        },
+        {
+          question: "Can I download my conversion results?",
+          answer: "Yes, you can download your conversion results as a text file for your records."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Utility Tools", path: "/utility-tools" },
+        { label: "Unit Converter", path: "/unit-converter" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="space-y-4">
         {/* Category Selection */}
@@ -255,7 +295,7 @@ export default function UnitConverterPage() {
                     <div>
                       <div className="text-2xl font-bold text-primary">{result}</div>
                       <div className="text-sm text-muted-foreground mt-1">
-                        {currentCategory.units[toUnit as keyof typeof currentCategory.units].name}
+                        {(currentCategory.units[toUnit as keyof typeof currentCategory.units] as any)?.name || toUnit}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -278,8 +318,8 @@ export default function UnitConverterPage() {
               <h3 className="font-semibold mb-2">Quick Reference</h3>
               <div className="text-sm text-muted-foreground">
                 <p>
-                  {inputValue} {currentCategory.units[fromUnit as keyof typeof currentCategory.units].name} = {result}{" "}
-                  {currentCategory.units[toUnit as keyof typeof currentCategory.units].name}
+                  {inputValue} {(currentCategory.units[fromUnit as keyof typeof currentCategory.units] as any)?.name || fromUnit} = {result}{" "}
+                  {(currentCategory.units[toUnit as keyof typeof currentCategory.units] as any)?.name || toUnit}
                 </p>
               </div>
             </CardContent>

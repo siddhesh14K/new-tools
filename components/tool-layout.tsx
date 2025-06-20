@@ -60,7 +60,7 @@ export function ToolLayout({
       />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <EnhancedBreadcrumb items={breadcrumbs} />
+        <EnhancedBreadcrumb items={breadcrumbs.map(item => ({ name: item.label, href: item.path }))} />
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -94,9 +94,8 @@ export function ToolLayout({
         <HowToSchema
           name={title}
           description={description}
-          steps={howToSteps}
-          totalTime={estimatedTime}
-          toolCategory={toolCategory}
+          step={howToSteps}
+          totalTime={estimatedTime || "PT2M"}
         />
 
         <Analytics />

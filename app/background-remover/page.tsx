@@ -202,6 +202,50 @@ export default function BackgroundRemoverPage() {
       title="AI Background Remover - Remove Image Background Online Free"
       description="Remove image backgrounds automatically using AI. Perfect for product photos, portraits, and graphics. No registration required, works on all devices."
       icon={<Wand2 className="h-8 w-8 text-green-700" />}
+      toolCategory="image-editing"
+      howToSteps={[
+        {
+          name: "Upload Image",
+          text: "Select or drag and drop your image file (JPG, PNG, WebP up to 20MB)"
+        },
+        {
+          name: "Adjust Settings",
+          text: "Set the sensitivity level for background removal based on your image"
+        },
+        {
+          name: "Remove Background",
+          text: "Click 'Remove Background' to process your image with AI"
+        },
+        {
+          name: "Download Result",
+          text: "Download your image with transparent background as PNG"
+        }
+      ]}
+      faqs={[
+        {
+          question: "What image formats are supported?",
+          answer: "We support JPG, JPEG, PNG, WebP, and BMP image formats up to 20MB in size."
+        },
+        {
+          question: "Is the background removal free?",
+          answer: "Yes, our AI background remover is completely free to use with no registration required."
+        },
+        {
+          question: "What happens to my uploaded images?",
+          answer: "All processing is done in your browser. Your images are never uploaded to our servers."
+        },
+        {
+          question: "What output format do I get?",
+          answer: "The processed image is provided as a PNG file with transparent background."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Image Tools", path: "/image-tools" },
+        { label: "Background Remover", path: "/background-remover" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT2M"
     >
       <div className="space-y-6">
         {/* Upload Area */}

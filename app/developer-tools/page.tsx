@@ -88,6 +88,50 @@ export default function DeveloperToolsPage() {
     <ToolLayout
       title="Free Developer Tools Online 2024"
       description="Essential developer tools for coding, debugging, and web development. JSON formatter, Base64 encoder, hash generator, and more."
+      icon={<Code className="h-8 w-8 text-cyan-500" />}
+      toolCategory="developer-tools"
+      howToSteps={[
+        {
+          name: "Choose Your Tool",
+          text: "Browse our collection of developer tools and select the one you need"
+        },
+        {
+          name: "Input Your Data",
+          text: "Enter your code, text, or upload files depending on the tool"
+        },
+        {
+          name: "Process & Format",
+          text: "Let the tool process your data with instant results"
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy the results to clipboard or download as files"
+        }
+      ]}
+      faqs={[
+        {
+          question: "Are these developer tools free to use?",
+          answer: "Yes, all our developer tools are completely free to use with no registration required. They work entirely in your browser."
+        },
+        {
+          question: "Do you store my code or data?",
+          answer: "No, all processing happens locally in your browser. We don't store, transmit, or have access to your code or data."
+        },
+        {
+          question: "Which tools are most popular among developers?",
+          answer: "Our most popular tools are the JSON Formatter, Base64 Encoder, and Hash Generator, used by thousands of developers daily."
+        },
+        {
+          question: "Can I use these tools on mobile devices?",
+          answer: "Yes, all our developer tools are mobile-friendly and work perfectly on smartphones and tablets."
+        }
+      ]}
+      breadcrumbs={[
+        { label: "Home", path: "/" },
+        { label: "Developer Tools", path: "/developer-tools" }
+      ]}
+      lastUpdated="2024-01-15"
+      estimatedTime="PT1M"
     >
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <Breadcrumb
